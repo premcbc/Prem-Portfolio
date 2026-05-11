@@ -301,7 +301,7 @@ h1.hero-title em {
 .btn-s:active { transform: translateY(0); }
 
 /* ─── PROJECT CARDS ─── */
-.projects-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+.projects-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
 .project-card {
   position: relative; border-radius: 18px; overflow: hidden;
   background: var(--card); border: 1px solid var(--bdr);
@@ -660,7 +660,7 @@ footer { padding: 28px 56px; border-top: 1px solid var(--bdr); display: flex; ju
   .hero { padding: 132px 40px 80px; }
 }
 @media (max-width: 1024px) {
-  .projects-grid { grid-template-columns: 1fr; }
+  .projects-grid { grid-template-columns: repeat(2, 1fr); }
   .project-card.fw .p-thumb { aspect-ratio: 16/9; }
   .about-grid { grid-template-columns: 1fr; gap: 48px; }
   .proc-grid, .ep-grid, .sk-grid { grid-template-columns: repeat(2, 1fr); }
@@ -671,6 +671,7 @@ footer { padding: 28px 56px; border-top: 1px solid var(--bdr); display: flex; ju
   nav { padding: 14px 22px; }
   nav.scrolled { padding: 11px 22px; }
   .hero { padding: 108px 22px 60px; }
+  .projects-grid { grid-template-columns: 1fr; }
   .nav-links, .nav-status, .nav-cta { display: none; }
   .hamburger { display: flex; }
   h1.hero-title { font-size: clamp(46px, 12vw, 82px); }
@@ -786,7 +787,7 @@ footer { padding: 28px 56px; border-top: 1px solid var(--bdr); display: flex; ju
   </div>
   <div class="projects-grid">
 
-    <a class="project-card fw rv" href="projects/sharpstakes.html">
+    <a class="project-card rv" href="projects/sharpstakes.html">
       <div class="p-thumb"><div class="p-inner pt1"><div class="p-word">SharpStakes</div><div class="p-tag-fl">Featured Case Study</div></div></div>
       <div class="p-info">
         <div class="p-row"><div class="p-name">SharpStakes</div><div class="p-geo">Canada · 2024–Present</div></div>
@@ -830,8 +831,8 @@ footer { padding: 28px 56px; border-top: 1px solid var(--bdr); display: flex; ju
       <div class="p-cta">View Details <svg width="12" height="12" fill="none"><path d="M2.5 9.5L9.5 2.5M9.5 2.5H4.5M9.5 2.5V7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
 
-    <div class="project-card fw rv" data-modal="cricket" role="button" tabindex="0">
-      <div class="p-thumb" style="aspect-ratio:21/9"><div class="p-inner pt5"><div class="p-word">LiveCricket</div></div></div>
+    <div class="project-card rv" data-modal="cricket" role="button" tabindex="0">
+      <div class="p-thumb"><div class="p-inner pt5"><div class="p-word">LiveCricket</div></div></div>
       <div class="p-info">
         <div class="p-row"><div class="p-name">Cricket Streaming App</div><div class="p-geo">Real-Time · 2023</div></div>
         <div class="p-type">Real-Time Sports Data System</div>
