@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SharpStakes Case Study — Prem Chandar</title>
+<meta name="description" content="Engineering case study: Multi-module sportsbook affiliate operations platform. 5K+ records, backend-heavy architecture, real-time data, commission engine.">
+<meta property="og:title" content="SharpStakes — SaaS Systems Case Study · Prem Chandar">
+<meta property="og:description" content="Multi-module sportsbook affiliate platform engineered for scale.">
+<link rel="canonical" href="https://premchandar.dev/projects/sharpstakes">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&family=JetBrains+Mono:wght@300;400;500&display=swap');
+:root{
+  --bg:#09090b;--bg2:#0d0d10;--card:#131316;--card-h:#18181c;
+  --t1:#f0f0f2;--t2:#8a8a9a;--t3:#46464f;--t4:#2a2a30;
+  --acc:#c8ff00;--acc-d:rgba(200,255,0,.1);--acc-m:rgba(200,255,0,.22);
+  --bdr:#1f1f24;--bdr-h:#2d2d34;
+  --grad:linear-gradient(135deg,#c8ff00 0%,#00ffc8 100%);
+  --sf:'Instrument Serif',Georgia,serif;--sn:'DM Sans',-apple-system,system-ui,sans-serif;--mn:'JetBrains Mono',monospace;
+  --eo:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--t1);font-family:var(--sn);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--acc-d);color:var(--t1)}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:15px 52px;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);background:rgba(9,9,11,.85);border-bottom:1px solid var(--bdr)}
+.nav-logo{font-family:var(--sf);font-size:20px;flex-shrink:0}
+.nav-logo span{color:var(--acc)}
+.breadcrumb{display:flex;align-items:center;gap:8px;font-family:var(--mn);font-size:12px;color:var(--t3)}
+.breadcrumb a{transition:color .2s}.breadcrumb a:hover{color:var(--t1)}
+.bc-sep{color:var(--t4)}
+.bc-cur{color:var(--acc)}
+.nav-back{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:var(--t2);padding:8px 16px;border:1px solid var(--bdr);border-radius:100px;transition:all .3s var(--eo);white-space:nowrap;min-height:36px}
+.nav-back:hover{border-color:var(--bdr-h);color:var(--t1);transform:translateX(-2px)}
+
+/* STICKY SECTION NAV */
+.section-nav{position:sticky;top:57px;z-index:90;background:rgba(9,9,11,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bdr);padding:0 52px;display:flex;gap:0;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none}
+.section-nav::-webkit-scrollbar{display:none}
+.sn-link{padding:14px 18px;font-family:var(--mn);font-size:12px;color:var(--t3);white-space:nowrap;border-bottom:2px solid transparent;transition:color .25s,border-color .25s;cursor:pointer;flex-shrink:0}
+.sn-link:hover{color:var(--t1)}
+.sn-link.active{color:var(--acc);border-bottom-color:var(--acc)}
+
+/* HERO */
+.cs-hero{min-height:88vh;display:flex;flex-direction:column;justify-content:flex-end;padding:140px 52px 68px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(145deg,#060e1c 0%,#0a1e3c 40%,#0d2d5a 80%,#09090b 100%)}
+.hero-glow{position:absolute;top:-10%;right:-5%;width:60%;height:100%;background:radial-gradient(ellipse at 80% 20%,rgba(200,255,0,.055) 0%,transparent 60%);pointer-events:none}
+.hero-noise{position:absolute;inset:0;opacity:.25;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none}
+.hero-content{position:relative;z-index:2}
+.cs-eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.cs-eyebrow-line{width:26px;height:1px;background:var(--acc);flex-shrink:0}
+.cs-eyebrow-text{font-family:var(--mn);font-size:11px;color:var(--acc);letter-spacing:.14em;text-transform:uppercase}
+.cs-hero h1{font-family:var(--sf);font-size:clamp(48px,7vw,108px);font-weight:400;letter-spacing:-.03em;line-height:.97;margin-bottom:18px}
+.cs-hero h1 em{font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cs-subtitle{font-size:clamp(15px,1.5vw,18px);color:var(--t2);max-width:540px;line-height:1.72;margin-bottom:44px}
+.cs-metrics{display:flex;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.06)}
+.cs-m{padding:20px 28px;border-right:1px solid rgba(255,255,255,.06);flex-shrink:0}
+.cs-m:last-child{border-right:none}
+.cs-m-v{font-family:var(--sf);font-size:clamp(22px,2.5vw,30px);background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:4px}
+.cs-m-l{font-family:var(--mn);font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.08em}
+.cs-tech{display:flex;flex-wrap:wrap;gap:7px;margin-top:28px}
+.cs-chip{padding:4px 12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:100px;font-family:var(--mn);font-size:11px;color:rgba(255,255,255,.5)}
+
+/* SECTIONS */
+section.cs{padding:88px 52px}
+section.cs.alt{background:var(--bg2)}
+.inner{max-width:900px}
+.wide{max-width:1100px}
+.s-tag{font-family:var(--mn);font-size:11px;color:var(--acc);letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
+.s-title{font-family:var(--sf);font-size:clamp(28px,3.5vw,48px);font-weight:400;letter-spacing:-.025em;line-height:1.05;margin-bottom:24px}
+.s-body{font-size:15px;color:var(--t2);line-height:1.85}
+.s-body p{margin-bottom:14px}
+.s-body p:last-child{margin-bottom:0}
+.s-body strong{color:var(--t1);font-weight:500}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(20px);transition:opacity .7s var(--eo),transform .7s var(--eo);will-change:opacity,transform}
+.rv.vis{opacity:1;transform:none}
+
+/* OVERVIEW GRID */
+.ov-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:36px}
+.ov-card{padding:24px;background:var(--card);border:1px solid var(--bdr);border-radius:14px;transition:border-color .3s,transform .3s var(--eo)}
+.ov-card:hover{border-color:var(--bdr-h);transform:translateY(-3px)}
+.ov-icon{width:36px;height:36px;border-radius:9px;background:var(--acc-d);display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:15px}
+.ov-card h4{font-size:14px;font-weight:500;margin-bottom:6px}
+.ov-card p{font-size:13px;color:var(--t2);line-height:1.62}
+
+/* CHALLENGES */
+.ch-list{margin-top:36px;border:1px solid var(--bdr);border-radius:16px;overflow:hidden}
+.ch-item{padding:26px 28px;border-bottom:1px solid var(--bdr);display:grid;grid-template-columns:44px 1fr;gap:20px;align-items:start;transition:background .3s}
+.ch-item:last-child{border-bottom:none}
+.ch-item:hover{background:var(--card)}
+.ch-n{font-family:var(--sf);font-size:22px;color:var(--acc);opacity:.45;line-height:1;padding-top:2px}
+.ch-item h4{font-size:15px;font-weight:500;margin-bottom:5px}
+.ch-item p{font-size:13px;color:var(--t2);line-height:1.7}
+.ch-item code{font-family:var(--mn);font-size:11px;color:var(--acc);background:var(--acc-d);padding:2px 6px;border-radius:4px}
+
+/* FLOW DIAGRAM */
+.flow-box{margin-top:36px;padding:28px;background:var(--card);border:1px solid var(--bdr);border-radius:16px}
+.flow-label{font-family:var(--mn);font-size:11px;color:var(--acc);letter-spacing:.1em;text-transform:uppercase;margin-bottom:22px}
+.flow-row{display:flex;align-items:center;overflow-x:auto;gap:0;padding-bottom:4px;-ms-overflow-style:none;scrollbar-width:none}
+.flow-row::-webkit-scrollbar{display:none}
+.fn{flex-shrink:0;padding:10px 14px;background:var(--bg);border:1px solid var(--bdr);border-radius:9px;font-size:12px;font-weight:500;text-align:center;min-width:100px}
+.fn.ac{background:var(--acc-d);border-color:rgba(200,255,0,.3);color:var(--acc)}
+.fn.dm{color:var(--t3)}
+.fn small{display:block;font-family:var(--mn);font-size:10px;color:var(--t3);margin-top:2px;font-weight:400}
+.fa{flex-shrink:0;padding:0 8px;color:var(--t4);font-size:14px}
+
+/* ARCH GRID */
+.arch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:36px}
+.arch-card{padding:22px;background:var(--card);border:1px solid var(--bdr);border-radius:14px;position:relative;overflow:hidden;transition:all .35s var(--eo)}
+.arch-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad);opacity:0;transition:opacity .35s}
+.arch-card:hover{border-color:var(--bdr-h);transform:translateY(-3px)}
+.arch-card:hover::after{opacity:1}
+.arch-tag{font-family:var(--mn);font-size:10px;color:var(--acc);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.arch-ph{width:100%;aspect-ratio:16/9;background:linear-gradient(145deg,var(--bg) 0%,var(--card-h) 100%);border-radius:8px;border:1px dashed var(--t4);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.arch-ph-txt{font-family:var(--mn);font-size:10px;color:var(--t4);text-align:center;line-height:1.5;padding:8px}
+.arch-ph img{width:100%;height:100%;object-fit:cover;border-radius:7px}
+.arch-card h4{font-size:13px;font-weight:500;margin-bottom:5px}
+.arch-card p{font-size:12px;color:var(--t2);line-height:1.58}
+
+/* OPT GRID */
+.opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:36px}
+.opt-card{padding:22px;background:var(--card);border:1px solid var(--bdr);border-radius:14px;transition:all .3s var(--eo)}
+.opt-card:hover{border-color:var(--bdr-h);transform:translateY(-3px)}
+.opt-tag{font-family:var(--mn);font-size:10px;color:var(--acc);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;display:block}
+.opt-card h4{font-size:13px;font-weight:500;margin-bottom:6px}
+.opt-card p{font-size:13px;color:var(--t2);line-height:1.6}
+.opt-code{margin-top:10px;padding:11px 13px;background:var(--bg);border:1px solid var(--bdr);border-radius:7px;font-family:var(--mn);font-size:11px;color:var(--t3);line-height:1.8}
+.kw{color:var(--acc)}
+.cm{color:var(--t4)}
+
+/* GALLERY */
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:36px}
+.gi{border-radius:11px;overflow:hidden;position:relative;cursor:pointer;border:1px solid var(--bdr);transition:all .4s var(--eo);aspect-ratio:16/10;background:var(--card)}
+.gi:hover{border-color:var(--bdr-h);transform:scale(1.025);box-shadow:0 20px 40px -10px rgba(0,0,0,.5)}
+.gi.lg{grid-column:span 2}
+.gi-ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:linear-gradient(145deg,var(--bg) 0%,var(--card-h) 100%)}
+.gi-icon{font-size:20px;opacity:.25}
+.gi-lbl{font-family:var(--mn);font-size:11px;color:var(--t3);text-align:center;padding:0 14px;line-height:1.5}
+.gi img{width:100%;height:100%;object-fit:cover;opacity:.75;transition:opacity .3s}
+.gi:hover img{opacity:1}
+.gi-ov{position:absolute;inset:0;background:rgba(9,9,11,.8);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;backdrop-filter:blur(4px)}
+.gi:hover .gi-ov{opacity:1}
+.gi-ov-txt{font-family:var(--mn);font-size:12px;color:var(--acc)}
+
+/* RESULTS */
+.results-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:36px}
+.rc{padding:24px 20px;background:var(--card);border:1px solid var(--bdr);border-radius:14px;text-align:center;transition:all .35s var(--eo)}
+.rc:hover{border-color:rgba(200,255,0,.3);transform:translateY(-4px);background:var(--card-h)}
+.rc-v{font-family:var(--sf);font-size:38px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:7px}
+.rc-l{font-size:13px;font-weight:500;margin-bottom:4px}
+.rc-d{font-size:11px;color:var(--t3);font-family:var(--mn);line-height:1.5}
+
+/* LIGHTBOX */
+.lb{position:fixed;inset:0;background:rgba(9,9,11,.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;opacity:0;pointer-events:none;transition:opacity .4s var(--eo);padding:20px}
+.lb.active{opacity:1;pointer-events:auto}
+.lb-close{position:absolute;top:20px;right:20px;width:42px;height:42px;border-radius:50%;background:var(--card);border:1px solid var(--bdr);color:var(--t2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;font-size:17px}
+.lb-close:hover{border-color:var(--acc);color:var(--acc)}
+.lb-ph{width:min(88vw,960px);aspect-ratio:16/9;background:var(--card);border:1px solid var(--bdr);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.lb-ph img{width:100%;height:100%;object-fit:cover;border-radius:11px}
+.lb-name{font-size:15px;font-weight:500}
+.lb-path{font-family:var(--mn);font-size:12px;color:var(--t3)}
+
+/* NEXT */
+.next-bar{padding:60px 52px;background:var(--bg2);border-top:1px solid var(--bdr)}
+.next-inner{display:flex;justify-content:space-between;align-items:center;gap:24px;max-width:900px}
+.next-lbl{font-family:var(--mn);font-size:11px;color:var(--t3);margin-bottom:7px}
+.next-title{font-family:var(--sf);font-size:clamp(22px,3vw,32px);font-weight:400}
+.next-btn{display:inline-flex;align-items:center;gap:9px;padding:13px 26px;background:var(--acc);color:var(--bg);font-size:13px;font-weight:600;border-radius:100px;transition:all .3s var(--eo);white-space:nowrap;flex-shrink:0}
+.next-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px var(--acc-m)}
+
+footer{padding:24px 52px;border-top:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;gap:16px}
+.fl{font-size:12px;color:var(--t3);font-family:var(--mn)}
+.fl a{color:var(--t3);transition:color .2s}.fl a:hover{color:var(--acc)}
+
+/* RESPONSIVE */
+@media(max-width:1024px){.arch-grid{grid-template-columns:repeat(2,1fr)}.results-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){
+  nav{padding:13px 20px}.breadcrumb{display:none}
+  .section-nav{padding:0 20px}.sn-link{padding:12px 12px;font-size:11px}
+  .cs-hero{padding:110px 20px 52px}section.cs{padding:64px 20px}
+  .opt-grid{grid-template-columns:1fr}.gallery{grid-template-columns:1fr}.gi.lg{grid-column:span 1}
+  .arch-grid{grid-template-columns:1fr}.results-grid{grid-template-columns:1fr 1fr}
+  .cs-metrics{overflow-x:auto}.cs-m{padding:16px 18px}
+  .ov-grid{grid-template-columns:1fr}.ch-item{grid-template-columns:36px 1fr;gap:14px}
+  .next-bar{padding:44px 20px}.next-inner{flex-direction:column;align-items:flex-start}
+  footer{flex-direction:column;gap:8px;text-align:center;padding:18px 20px}
+  .lb-ph{width:92vw}
+}
+@media(max-width:480px){
+  .cs-hero h1{font-size:clamp(38px,12vw,60px)}
+  .results-grid{grid-template-columns:1fr}
+  .cs-metrics{flex-wrap:wrap}
+  .cs-m{width:50%;border-right:none;border-bottom:1px solid rgba(255,255,255,.06)}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html" class="nav-logo">prem<span>.</span></a>
+  <div class="breadcrumb">
+    <a href="../index.html">Home</a><span class="bc-sep">/</span>
+    <a href="../index.html#work">Work</a><span class="bc-sep">/</span>
+    <span class="bc-cur">SharpStakes</span>
+  </div>
+  <a href="../index.html#work" class="nav-back">
+    <svg width="13" height="13" fill="none"><path d="M8.5 3L4 6.5l4.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    All Work
+  </a>
+</nav>
+
+<div class="section-nav" id="sectionNav" role="navigation" aria-label="Page sections">
+  <a class="sn-link" data-target="overview">Overview</a>
+  <a class="sn-link" data-target="challenges">Challenges</a>
+  <a class="sn-link" data-target="architecture">Architecture</a>
+  <a class="sn-link" data-target="optimization">Optimization</a>
+  <a class="sn-link" data-target="gallery">Screenshots</a>
+  <a class="sn-link" data-target="results">Results</a>
+</div>
+
+<!-- HERO -->
+<section class="cs-hero">
+  <div class="hero-bg"></div><div class="hero-glow"></div><div class="hero-noise"></div>
+  <div class="hero-content">
+    <div class="cs-eyebrow"><div class="cs-eyebrow-line"></div><div class="cs-eyebrow-text">Case Study · Canada · 2024–Present</div></div>
+    <h1>SharpStakes<br><em>Ambassador Tech</em></h1>
+    <p class="cs-subtitle">Multi-role sportsbook affiliate operations platform engineered for scale. Backend-heavy, performance-tuned, built for real operator workflows.</p>
+    <div class="cs-metrics">
+      <div class="cs-m"><div class="cs-m-v">5K+</div><div class="cs-m-l">Records Optimized</div></div>
+      <div class="cs-m"><div class="cs-m-v">7+</div><div class="cs-m-l">Modules Built</div></div>
+      <div class="cs-m"><div class="cs-m-v">0</div><div class="cs-m-l">Manual Payout Errors</div></div>
+      <div class="cs-m"><div class="cs-m-v">0.3s</div><div class="cs-m-l">Real-Time Poll Rate</div></div>
+    </div>
+    <div class="cs-tech">
+      <span class="cs-chip">Bubble.io</span><span class="cs-chip">Backend Workflows</span><span class="cs-chip">Real-Time APIs</span><span class="cs-chip">Commission Engine</span><span class="cs-chip">Performance Optimization</span><span class="cs-chip">Admin Tooling</span><span class="cs-chip">Streak Logic</span><span class="cs-chip">Referral Systems</span>
+    </div>
+  </div>
+</section>
+
+<!-- OVERVIEW -->
+<section class="cs alt" id="overview">
+  <div class="inner">
+    <div class="s-tag rv">Project Overview</div>
+    <h2 class="s-title rv">What SharpStakes does</h2>
+    <div class="s-body rv">
+      <p>SharpStakes is a <strong>production SaaS platform</strong> for sportsbook affiliates — the operational infrastructure running ambassador networks across US and Canadian betting markets. It replaces manual workflows (spreadsheet commissions, email approvals, DM-based support) with a <strong>fully automated multi-role system</strong> used daily by operators and hundreds of ambassadors.</p>
+      <p>The system handles large data volumes, real-time sportsbook feeds, complex commission logic, and daily operational workflows without degradation. Built to run a real business, not a demo.</p>
+    </div>
+    <div class="ov-grid">
+      <div class="ov-card rv"><div class="ov-icon">👤</div><h4>Ambassador Management</h4><p>Full lifecycle: onboarding, tier assignment, referral tracking, status management, and performance monitoring with multi-role access.</p></div>
+      <div class="ov-card rv"><div class="ov-icon">📸</div><h4>Screenshot Approval Pipeline</h4><p>Ambassadors submit bet screenshots for commission. Automated review queue with approval, rejection, reason tracking, and payout triggering.</p></div>
+      <div class="ov-card rv"><div class="ov-icon">💰</div><h4>Commission Engine</h4><p>Configurable payout rules per tier and bet type. Automated calculation, queue processing, and disbursement with zero manual intervention.</p></div>
+      <div class="ov-card rv"><div class="ov-icon">📊</div><h4>Analytics &amp; Retention</h4><p>Weekly streak system, leaderboards, performance dashboards, configurable time-range reporting, and operator-level analytics.</p></div>
+      <div class="ov-card rv"><div class="ov-icon">⚡</div><h4>Real-Time Sportsbook Data</h4><p>Live odds, parlay builder, and bet tracker integrated with US/Canada sportsbook APIs via recursive polling workflows.</p></div>
+      <div class="ov-card rv"><div class="ov-icon">🛠</div><h4>Operator Admin Tooling</h4><p>Full admin portal: ambassador oversight, bulk operations, system configuration, audit trails, and complete operational visibility.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CHALLENGES -->
+<section class="cs" id="challenges">
+  <div class="inner">
+    <div class="s-tag rv">Engineering Challenges</div>
+    <h2 class="s-title rv">The hard problems</h2>
+    <div class="s-body rv"><p>SharpStakes required solving several non-trivial engineering problems — performance at scale, complex temporal logic, real-time data handling, and operational reliability, simultaneously.</p></div>
+    <div class="ch-list rv">
+      <div class="ch-item"><div class="ch-n">01</div><div><h4>Large Dataset Performance at 5K+ Records</h4><p>Eliminated all full-list searches. Every query uses <code>:filtered</code> with server-side constraints — role, status, date ranges — before results hit the page. Combined with <code>:count</code> guards and conditional states, query volume reduced over 70% versus a naive implementation.</p></div></div>
+      <div class="ch-item"><div class="ch-n">02</div><div><h4>Weekly Streak Calculation with Timezone Handling</h4><p>Streak systems need consecutive weekly tracking. Bubble stores UTC; ambassadors span US Eastern, Central, and Canadian timezones. Built a server-side streak engine using scheduled backend workflows that calculate week boundaries in the ambassador's local timezone, storing <code>last_active_week</code> and comparing against <code>current_week_number</code> without any frontend calculation.</p></div></div>
+      <div class="ch-item"><div class="ch-n">03</div><div><h4>Commission Logic Complexity</h4><p>Rules differ by ambassador tier, sportsbook, bet type, and market. Built a <strong>configurable commission rule engine</strong> — a data-driven table of conditions and multipliers evaluated per submission by the backend, rather than hardcoded branching. Operators modify commission structures without developer involvement.</p></div></div>
+      <div class="ch-item"><div class="ch-n">04</div><div><h4>Recursive Workflow Architecture for Real-Time Data</h4><p>Implemented a <strong>recursive backend workflow pattern</strong> — a workflow that triggers itself on completion — enabling continuous API polling at controlled intervals. Key constraint: circuit-breaker logic terminates the loop on repeated API errors rather than creating an infinite cascade.</p></div></div>
+      <div class="ch-item"><div class="ch-n">05</div><div><h4>Screenshot Approval at Scale</h4><p>Designed the screenshot data type with index-able fields from day one — market, status, ambassador, date, sportsbook. The approval workflow is entirely server-side: status transitions, payout triggers, notification sends, and audit log writes all happen in a single backend chain without a page refresh.</p></div></div>
+      <div class="ch-item"><div class="ch-n">06</div><div><h4>Multi-Country Market Segmentation</h4><p>US and Canadian markets have different odds formats, payment rails, and commission structures. Built <strong>market-aware data architecture</strong> — a top-level market flag propagating through the commission engine, display logic, and reporting layer, keeping operations logically separated without duplicating workflows.</p></div></div>
+      <div class="ch-item"><div class="ch-n">07</div><div><h4>Referral Attribution Integrity</h4><p>Referral chains need atomic attribution. Used Bubble's option set + lock field pattern to ensure single-write attribution, with a server-side validation step that checks attribution before committing the referral record — no race conditions.</p></div></div>
+      <div class="ch-item"><div class="ch-n">08</div><div><h4>Admin Query Performance</h4><p>Consolidated aggregations into <strong>pre-computed summary fields</strong> updated by backend workflows on relevant events (new submission, status change, weekly rollup). Admin pages read from summary records rather than recomputing live on load.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section class="cs alt" id="architecture">
+  <div class="wide">
+    <div class="s-tag rv">Architecture</div>
+    <h2 class="s-title rv">System architecture &amp; data flow</h2>
+    <div class="s-body rv"><p>SharpStakes is structured around a <strong>backend-first architecture</strong> — all business logic lives in server-side workflows, the frontend reads pre-computed state, and UI interactions trigger backend chains rather than in-page calculations.</p></div>
+    <div class="flow-box rv">
+      <div class="flow-label">Ambassador Commission Flow</div>
+      <div class="flow-row">
+        <div class="fn dm">Ambassador<small>submits screenshot</small></div><div class="fa">→</div>
+        <div class="fn">Validation<small>format + duplicate</small></div><div class="fa">→</div>
+        <div class="fn ac">Review Queue<small>operator review</small></div><div class="fa">→</div>
+        <div class="fn">Commission Calc<small>rule engine</small></div><div class="fa">→</div>
+        <div class="fn">Payout<small>auto-disbursement</small></div><div class="fa">→</div>
+        <div class="fn ac">Audit Log<small>immutable record</small></div>
+      </div>
+    </div>
+    <div class="arch-grid" style="margin-top:20px">
+      <div class="arch-card rv"><div class="arch-tag">Data Layer</div><div class="arch-ph"><div class="arch-ph-txt">/images/sharpstakes/<br>data-architecture.png</div></div><h4>Ambassador Data Model</h4><p>Normalized types with indexed query fields. Commission rules stored as data records, not code branches.</p></div>
+      <div class="arch-card rv"><div class="arch-tag">Workflow Engine</div><div class="arch-ph"><div class="arch-ph-txt">/images/sharpstakes/<br>workflow-architecture.png</div></div><h4>Backend Workflow Chain</h4><p>Approval → calculation → payout → notification → audit. One atomic chain, zero page refreshes.</p></div>
+      <div class="arch-card rv"><div class="arch-tag">Real-Time Layer</div><div class="arch-ph"><div class="arch-ph-txt">/images/sharpstakes/<br>realtime-polling.png</div></div><h4>Recursive Polling System</h4><p>Self-triggering loop for live sportsbook data. Circuit breaker on API failure. No degradation over time.</p></div>
+      <div class="arch-card rv"><div class="arch-tag">Streak System</div><div class="arch-ph"><div class="arch-ph-txt">/images/sharpstakes/<br>streak-system.png</div></div><h4>Weekly Streak Engine</h4><p>Scheduled backend calculation with timezone normalization. Continuation vs. reset determined server-side.</p></div>
+      <div class="arch-card rv"><div class="arch-tag">Admin Portal</div><div class="arch-ph"><div class="arch-ph-txt">/images/sharpstakes/<br>admin-portal.png</div></div><h4>Operator Dashboard</h4><p>Pre-aggregated summary reads. Bulk operations via server-side list processing. Configurable time ranges.</p></div>
+      <div class="arch-card rv"><div class="arch-tag">Commission Engine</div><div class="arch-ph"><div class="arch-ph-txt">/images/sharpstakes/<br>commission-engine.png</div></div><h4>Rule-Based Commission</h4><p>Data-driven rule table evaluated per submission. Operators configure rules without developer involvement.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- OPTIMIZATION -->
+<section class="cs" id="optimization">
+  <div class="inner">
+    <div class="s-tag rv">Performance Engineering</div>
+    <h2 class="s-title rv">Optimization techniques</h2>
+    <div class="s-body rv"><p>Performance on Bubble.io at scale requires deliberate architectural decisions. Here are the core patterns applied across SharpStakes.</p></div>
+    <div class="opt-grid rv">
+      <div class="opt-card"><span class="opt-tag">Query Design</span><h4>Constrained Server-Side Searches</h4><p>Every search applies the minimum constraint set before Bubble fetches. Status + date range + market filter applied server-side — never filtering a full list client-side.</p><div class="opt-code"><span class="cm">// Always constrain before fetch</span><br>Search <span class="kw">Ambassadors</span><br>&nbsp;:status = <span class="kw">active</span><br>&nbsp;:market = <span class="kw">user.market</span><br>&nbsp;:created &gt; <span class="kw">start_of_week</span></div></div>
+      <div class="opt-card"><span class="opt-tag">Aggregation Pattern</span><h4>Pre-Computed Summary Fields</h4><p>Admin dashboards read from summary records updated by backend events — not live aggregations. Total commissions, submission counts, streak values: all pre-computed on event trigger.</p><div class="opt-code"><span class="cm">// On every approval:</span><br>Make changes to <span class="kw">AmbassadorSummary</span><br>&nbsp;total_paid += <span class="kw">commission_amount</span><br>&nbsp;approved_count += <span class="kw">1</span></div></div>
+      <div class="opt-card"><span class="opt-tag">Pagination</span><h4>Server-Side Pagination</h4><p>All list views use Bubble's built-in pagination with server-side page counts. No client-side list slicing. Page size tuned to 25 items for optimal load time.</p><div class="opt-code"><span class="cm">// Never load full list</span><br>RG data source:<br>&nbsp;Search <span class="kw">Submissions</span> &gt; paginate<br>&nbsp;Page <span class="kw">current_page</span>, size <span class="kw">25</span></div></div>
+      <div class="opt-card"><span class="opt-tag">State Management</span><h4>Custom State for UI Only</h4><p>UI state (active tab, filter selection) stored in custom states — never re-fetched from the database on toggle. Filter changes trigger a single new constrained search.</p><div class="opt-code"><span class="cm">// Filter change → one search</span><br>When filter changes:<br>&nbsp;Set state <span class="kw">active_filter</span><br>&nbsp;RG updates <span class="kw">automatically</span></div></div>
+      <div class="opt-card"><span class="opt-tag">Backend Workflows</span><h4>Chained Server-Side Processing</h4><p>Multi-step operations execute in a single backend workflow chain. The page never waits for intermediary steps — it just reads the final state.</p><div class="opt-code"><span class="cm">// One trigger, full chain</span><br>Backend: <span class="kw">approve_submission</span><br>&nbsp;Step 1: Update submission<br>&nbsp;Step 2: <span class="kw">Trigger commission_calc</span><br>&nbsp;Step 3: <span class="kw">Send notification</span></div></div>
+      <div class="opt-card"><span class="opt-tag">Data Modeling</span><h4>Indexed Query Fields by Design</h4><p>Data types designed with query patterns in mind from day one — market, status, week_number, and tier fields exist specifically because they appear in search constraints.</p><div class="opt-code"><span class="cm">// Designed for search first</span><br>Ambassador type:<br>&nbsp;<span class="kw">market</span>: option (US / CA)<br>&nbsp;<span class="kw">streak</span>: number<br>&nbsp;<span class="kw">tier</span>: option set</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section class="cs alt" id="gallery">
+  <div class="wide">
+    <div class="s-tag rv">Screenshots</div>
+    <h2 class="s-title rv">Platform walkthrough</h2>
+    <div class="s-body rv"><p>Key screens from the SharpStakes platform. Replace paths with real screenshots from <code>/images/sharpstakes/</code>. Click any image to expand.</p></div>
+    <div class="gallery rv">
+      <div class="gi lg" data-lbl="Ambassador Dashboard" data-src="/images/sharpstakes/dashboard.png"><div class="gi-ph"><div class="gi-icon">🖥</div><div class="gi-lbl">/images/sharpstakes/dashboard.png<br>Ambassador Dashboard — Main View</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
+      <div class="gi" data-lbl="Streak System" data-src="/images/sharpstakes/streak-system.png"><div class="gi-ph"><div class="gi-icon">🔥</div><div class="gi-lbl">/images/sharpstakes/<br>streak-system.png</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
+      <div class="gi" data-lbl="Admin Portal" data-src="/images/sharpstakes/admin-portal.png"><div class="gi-ph"><div class="gi-icon">⚙</div><div class="gi-lbl">/images/sharpstakes/<br>admin-portal.png</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
+      <div class="gi" data-lbl="Approval Queue" data-src="/images/sharpstakes/approval-queue.png"><div class="gi-ph"><div class="gi-icon">✓</div><div class="gi-lbl">/images/sharpstakes/<br>approval-queue.png</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
+      <div class="gi lg" data-lbl="Analytics Dashboard" data-src="/images/sharpstakes/analytics.png"><div class="gi-ph"><div class="gi-icon">📊</div><div class="gi-lbl">/images/sharpstakes/analytics.png<br>Analytics Dashboard — Operator View</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
+      <div class="gi" data-lbl="Commission Engine" data-src="/images/sharpstakes/commission.png"><div class="gi-ph"><div class="gi-icon">💰</div><div class="gi-lbl">/images/sharpstakes/<br>commission.png</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section class="cs" id="results">
+  <div class="wide">
+    <div class="s-tag rv">Outcomes</div>
+    <h2 class="s-title rv">Results &amp; impact</h2>
+    <div class="s-body rv"><p>SharpStakes replaced manual operations with automated systems. Here's the measured impact across key operational areas.</p></div>
+    <div class="results-grid rv">
+      <div class="rc"><div class="rc-v">100%</div><div class="rc-l">Commission Automation</div><div class="rc-d">Zero manual payout calculations. Rule engine handles all tier/market variants</div></div>
+      <div class="rc"><div class="rc-v">5K+</div><div class="rc-l">Records Tuned</div><div class="rc-d">All queries constrained server-side. No full-list scans in production</div></div>
+      <div class="rc"><div class="rc-v">7+</div><div class="rc-l">Modules Shipped</div><div class="rc-d">Ambassador, Admin, Parlay, Chat, Analytics, Referral, Streak System</div></div>
+      <div class="rc"><div class="rc-v">~0s</div><div class="rc-l">Admin Load Time</div><div class="rc-d">Pre-aggregated summaries. Dashboards load from single summary records</div></div>
+    </div>
+    <div class="s-body rv" style="margin-top:36px">
+      <p><strong>Operational shift:</strong> Daily manual work from operators — reviewing screenshots, calculating commissions, tracking ambassador performance — now runs automatically. Operators oversee the system, not maintain it.</p>
+      <p><strong>Technical shift:</strong> SharpStakes demonstrates that Bubble.io can handle genuine enterprise-scale operational workflows when the architecture is right. The constraint isn't the platform — it's how you use it.</p>
+    </div>
+  </div>
+</section>
+
+<div class="next-bar">
+  <div class="next-inner">
+    <div><div class="next-lbl">Next Case Study</div><div class="next-title">Djiminy — Enterprise Device &amp; Lifecycle Platform</div></div>
+    <a href="djiminy.html" class="next-btn">View Case Study <svg width="14" height="14" fill="none"><path d="M3 7h8M7.5 3.5l4 3.5-4 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  </div>
+</div>
+
+<footer>
+  <div class="fl"><a href="../index.html">premchandar.dev</a></div>
+  <div class="fl">SharpStakes Case Study · 2024–Present</div>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lb" role="dialog" aria-modal="true">
+  <button class="lb-close" onclick="closeLb()" aria-label="Close lightbox">✕</button>
+  <div class="lb-ph" id="lb-content">
+    <div class="lb-name" id="lb-name"></div>
+    <div class="lb-path" id="lb-path"></div>
+  </div>
+</div>
+
+<script>
+/* Reveal */
+var rvEls=document.querySelectorAll('.rv');
+if('IntersectionObserver' in window){
+  var o=new IntersectionObserver(function(e){e.forEach(function(i){if(i.isIntersecting){i.target.classList.add('vis');o.unobserve(i.target)}})},{threshold:.07});
+  rvEls.forEach(function(el){o.observe(el)});
+}else{rvEls.forEach(function(el){el.classList.add('vis')})}
+setTimeout(function(){rvEls.forEach(function(el){el.classList.add('vis')})},3000);
+
+/* Gallery + Lightbox */
+var lb=document.getElementById('lb');
+document.querySelectorAll('.gi').forEach(function(gi){
+  gi.addEventListener('click',function(){
+    var lbl=this.getAttribute('data-lbl'),src=this.getAttribute('data-src');
+    var c=document.getElementById('lb-content');
+    c.innerHTML='';
+    var img=new Image();
+    img.onload=function(){c.appendChild(img)};
+    img.onerror=function(){
+      c.innerHTML='<div class="lb-name">'+lbl+'</div><div class="lb-path">'+src+'</div>';
+    };
+    img.src=src;img.alt=lbl;
+    lb.classList.add('active');
+    document.body.style.overflow='hidden';
+  });
+});
+function closeLb(){lb.classList.remove('active');document.body.style.overflow=''}
+lb.addEventListener('click',function(e){if(e.target===lb)closeLb()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLb()});
+
+/* Sticky section nav active state */
+var sections=['overview','challenges','architecture','optimization','gallery','results'];
+var snLinks=document.querySelectorAll('.sn-link');
+function updateSN(){
+  var top=window.scrollY+120;
+  var cur='';
+  sections.forEach(function(id){var el=document.getElementById(id);if(el&&el.offsetTop<=top)cur=id});
+  snLinks.forEach(function(l){l.classList.toggle('active',l.getAttribute('data-target')===cur)});
+}
+window.addEventListener('scroll',updateSN,{passive:true});
+snLinks.forEach(function(l){
+  l.addEventListener('click',function(){
+    var t=document.getElementById(this.getAttribute('data-target'));
+    if(t)t.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+</script>
+</body>
+</html>
