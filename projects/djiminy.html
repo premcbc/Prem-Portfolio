@@ -167,7 +167,7 @@ section.cs.alt{background:var(--bg2)}
 .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:36px}
 .gi{border-radius:11px;overflow:hidden;position:relative;cursor:pointer;border:1px solid var(--bdr);transition:all .4s var(--eo);aspect-ratio:16/10;background:var(--card)}
 .gi:hover{border-color:var(--bdr-h);transform:scale(1.025);box-shadow:0 20px 40px -10px rgba(0,0,0,.5)}
-.gi.lg{grid-column:span 2}
+.gi.hero-gi{grid-column:1/-1;aspect-ratio:21/9}
 .gi-ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:linear-gradient(145deg,var(--bg) 0%,var(--card-h) 100%)}
 .gi-icon{font-size:20px;opacity:.25}
 .gi-lbl{font-family:var(--mn);font-size:11px;color:var(--t3);text-align:center;padding:0 14px;line-height:1.5}
@@ -442,11 +442,11 @@ footer{padding:24px 52px;border-top:1px solid var(--bdr);display:flex;justify-co
     <h2 class="s-title rv">Platform walkthrough</h2>
     <div class="s-body rv"><p>Key screens from the Djiminy platform. Replace placeholder paths with real screenshots from <code>/images/djiminy/</code>.</p></div>
     <div class="gallery rv">
-      <div class="gi lg" data-lbl="Inventory Dashboard" data-src="/images/djiminy/inventory-dashboard.png"><div class="gi-ph"><div class="gi-icon">📦</div><div class="gi-lbl">/images/djiminy/inventory-dashboard.png<br>Main Inventory Dashboard — Admin View</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
+      <div class="gi hero-gi" data-lbl="Inventory Dashboard" data-src="/images/djiminy/inventory-dashboard.png"><div class="gi-ph"><div class="gi-icon">📦</div><div class="gi-lbl">/images/djiminy/inventory-dashboard.png — Main Inventory Dashboard · Admin View</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
       <div class="gi" data-lbl="Device Lifecycle" data-src="/images/djiminy/device-lifecycle.png"><div class="gi-ph"><div class="gi-icon">🔄</div><div class="gi-lbl">/images/djiminy/<br>device-lifecycle.png</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
       <div class="gi" data-lbl="User Profile & Assignments" data-src="/images/djiminy/user-profile.png"><div class="gi-ph"><div class="gi-icon">👤</div><div class="gi-lbl">/images/djiminy/<br>user-profile.png</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
       <div class="gi" data-lbl="Boarding Workflow UI" data-src="/images/djiminy/boarding-ui.png"><div class="gi-ph"><div class="gi-icon">⇄</div><div class="gi-lbl">/images/djiminy/<br>boarding-ui.png</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
-      <div class="gi lg" data-lbl="Audit Trail" data-src="/images/djiminy/audit-trail.png"><div class="gi-ph"><div class="gi-icon">📋</div><div class="gi-lbl">/images/djiminy/audit-trail.png<br>Audit Trail — Filterable Admin View</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
+      <div class="gi" data-lbl="Audit Trail" data-src="/images/djiminy/audit-trail.png"><div class="gi-ph"><div class="gi-icon">📋</div><div class="gi-lbl">/images/djiminy/<br>audit-trail.png</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
       <div class="gi" data-lbl="Figma Designs" data-src="/images/djiminy/figma-designs.png"><div class="gi-ph"><div class="gi-icon">✦</div><div class="gi-lbl">/images/djiminy/<br>figma-designs.png</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
     </div>
   </div>

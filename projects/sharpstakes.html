@@ -102,11 +102,12 @@ section.cs.alt{background:var(--bg2)}
 .flow-label{font-family:var(--mn);font-size:11px;color:var(--acc);letter-spacing:.1em;text-transform:uppercase;margin-bottom:22px}
 .flow-row{display:flex;align-items:center;overflow-x:auto;gap:0;padding-bottom:4px;-ms-overflow-style:none;scrollbar-width:none}
 .flow-row::-webkit-scrollbar{display:none}
-.fn{flex-shrink:0;padding:10px 14px;background:var(--bg);border:1px solid var(--bdr);border-radius:9px;font-size:12px;font-weight:500;text-align:center;min-width:100px}
-.fn.ac{background:var(--acc-d);border-color:rgba(200,255,0,.3);color:var(--acc)}
-.fn.dm{color:var(--t3)}
-.fn small{display:block;font-family:var(--mn);font-size:10px;color:var(--t3);margin-top:2px;font-weight:400}
-.fa{flex-shrink:0;padding:0 8px;color:var(--t4);font-size:14px}
+.fn{flex-shrink:0;padding:10px 14px;background:var(--bg2);border:1px solid var(--bdr-h);border-radius:9px;font-size:12px;font-weight:500;text-align:center;min-width:100px;color:var(--t1)}
+.fn.ac{background:var(--acc-d);border-color:rgba(200,255,0,.35);color:var(--acc)}
+.fn.dm{color:var(--t2);background:var(--bg2)}
+.fn small{display:block;font-family:var(--mn);font-size:10px;color:var(--t2);margin-top:3px;font-weight:400}
+.fn.ac small{color:rgba(200,255,0,.65)}
+.fa{flex-shrink:0;padding:0 8px;color:var(--t2);font-size:14px}
 
 /* ARCH GRID */
 .arch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:36px}
@@ -134,9 +135,10 @@ section.cs.alt{background:var(--bg2)}
 
 /* GALLERY */
 .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:36px}
+.gallery.has-hero{grid-template-columns:repeat(3,1fr)}
 .gi{border-radius:11px;overflow:hidden;position:relative;cursor:pointer;border:1px solid var(--bdr);transition:all .4s var(--eo);aspect-ratio:16/10;background:var(--card)}
 .gi:hover{border-color:var(--bdr-h);transform:scale(1.025);box-shadow:0 20px 40px -10px rgba(0,0,0,.5)}
-.gi.lg{grid-column:span 2}
+.gi.hero-gi{grid-column:1/-1;aspect-ratio:21/9}
 .gi-ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:linear-gradient(145deg,var(--bg) 0%,var(--card-h) 100%)}
 .gi-icon{font-size:20px;opacity:.25}
 .gi-lbl{font-family:var(--mn);font-size:11px;color:var(--t3);text-align:center;padding:0 14px;line-height:1.5}
@@ -182,7 +184,7 @@ footer{padding:24px 52px;border-top:1px solid var(--bdr);display:flex;justify-co
   nav{padding:13px 20px}.breadcrumb{display:none}
   .section-nav{padding:0 20px}.sn-link{padding:12px 12px;font-size:11px}
   .cs-hero{padding:110px 20px 52px}section.cs{padding:64px 20px}
-  .opt-grid{grid-template-columns:1fr}.gallery{grid-template-columns:1fr}.gi.lg{grid-column:span 1}
+  .opt-grid{grid-template-columns:1fr}.gallery{grid-template-columns:1fr}.gi.hero-gi{grid-column:span 1;aspect-ratio:16/10}
   .arch-grid{grid-template-columns:1fr}.results-grid{grid-template-columns:1fr 1fr}
   .cs-metrics{overflow-x:auto}.cs-m{padding:16px 18px}
   .ov-grid{grid-template-columns:1fr}.ch-item{grid-template-columns:36px 1fr;gap:14px}
@@ -331,12 +333,12 @@ footer{padding:24px 52px;border-top:1px solid var(--bdr);display:flex;justify-co
     <div class="s-tag rv">Screenshots</div>
     <h2 class="s-title rv">Platform walkthrough</h2>
     <div class="s-body rv"><p>Key screens from the SharpStakes platform. Replace paths with real screenshots from <code>/images/sharpstakes/</code>. Click any image to expand.</p></div>
-    <div class="gallery rv">
-      <div class="gi lg" data-lbl="Ambassador Dashboard" data-src="/images/sharpstakes/dashboard.png"><div class="gi-ph"><div class="gi-icon">🖥</div><div class="gi-lbl">/images/sharpstakes/dashboard.png<br>Ambassador Dashboard — Main View</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
+    <div class="gallery rv has-hero">
+      <div class="gi hero-gi" data-lbl="Ambassador Dashboard" data-src="/images/sharpstakes/dashboard.png"><div class="gi-ph"><div class="gi-icon">🖥</div><div class="gi-lbl">/images/sharpstakes/dashboard.png — Ambassador Dashboard · Main View</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
       <div class="gi" data-lbl="Streak System" data-src="/images/sharpstakes/streak-system.png"><div class="gi-ph"><div class="gi-icon">🔥</div><div class="gi-lbl">/images/sharpstakes/<br>streak-system.png</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
       <div class="gi" data-lbl="Admin Portal" data-src="/images/sharpstakes/admin-portal.png"><div class="gi-ph"><div class="gi-icon">⚙</div><div class="gi-lbl">/images/sharpstakes/<br>admin-portal.png</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
       <div class="gi" data-lbl="Approval Queue" data-src="/images/sharpstakes/approval-queue.png"><div class="gi-ph"><div class="gi-icon">✓</div><div class="gi-lbl">/images/sharpstakes/<br>approval-queue.png</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
-      <div class="gi lg" data-lbl="Analytics Dashboard" data-src="/images/sharpstakes/analytics.png"><div class="gi-ph"><div class="gi-icon">📊</div><div class="gi-lbl">/images/sharpstakes/analytics.png<br>Analytics Dashboard — Operator View</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
+      <div class="gi" data-lbl="Analytics Dashboard" data-src="/images/sharpstakes/analytics.png"><div class="gi-ph"><div class="gi-icon">📊</div><div class="gi-lbl">/images/sharpstakes/<br>analytics.png</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
       <div class="gi" data-lbl="Commission Engine" data-src="/images/sharpstakes/commission.png"><div class="gi-ph"><div class="gi-icon">💰</div><div class="gi-lbl">/images/sharpstakes/<br>commission.png</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
     </div>
   </div>
