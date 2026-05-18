@@ -331,12 +331,12 @@ footer{padding:24px 52px;border-top:1px solid var(--bdr);display:flex;justify-co
       </div>
     </div>
     <div class="arch-grid" style="margin-top:20px">
-      <div class="arch-card rv"><div class="arch-tag">Data Layer</div><div class="arch-ph" data-src="/images/sharpstakes/data-architecture.png"><div class="arch-ph-txt">Ambassador Data Model</div></div><h4>Ambassador Data Model</h4><p>Normalized types with indexed query fields. Commission rules stored as data records, not code branches.</p></div>
-      <div class="arch-card rv"><div class="arch-tag">Workflow Engine</div><div class="arch-ph" data-src="/images/sharpstakes/workflow-architecture.png"><div class="arch-ph-txt">Backend Workflow Chain</div></div><h4>Backend Workflow Chain</h4><p>Approval → calculation → payout → notification → audit. One atomic chain, zero page refreshes.</p></div>
-      <div class="arch-card rv"><div class="arch-tag">Real-Time Layer</div><div class="arch-ph" data-src="/images/sharpstakes/realtime-polling.png"><div class="arch-ph-txt">Recursive Polling System</div></div><h4>Recursive Polling System</h4><p>Self-triggering loop for live sportsbook data. Circuit breaker on API failure. No degradation over time.</p></div>
-      <div class="arch-card rv"><div class="arch-tag">Streak System</div><div class="arch-ph" data-src="/images/sharpstakes/streak-system.png"><div class="arch-ph-txt">Weekly Streak Engine</div></div><h4>Weekly Streak Engine</h4><p>Scheduled backend calculation with timezone normalization. Continuation vs. reset determined server-side.</p></div>
-      <div class="arch-card rv"><div class="arch-tag">Admin Portal</div><div class="arch-ph" data-src="/images/sharpstakes/admin-portal.png"><div class="arch-ph-txt">Operator Dashboard</div></div><h4>Operator Dashboard</h4><p>Pre-aggregated summary reads. Bulk operations via server-side list processing. Configurable time ranges.</p></div>
-      <div class="arch-card rv"><div class="arch-tag">Commission Engine</div><div class="arch-ph" data-src="/images/sharpstakes/commission-engine.png"><div class="arch-ph-txt">Rule-Based Commission</div></div><h4>Rule-Based Commission</h4><p>Data-driven rule table evaluated per submission. Operators configure rules without developer involvement.</p></div>
+      <div class="arch-card rv"><div class="arch-tag">Data Layer</div><div class="gi" data-lbl="Ambassador Data Model" data-src="/images/sharpstakes/data-architecture.png"><div class="gi-ph"><div class="gi-icon">⬡</div><div class="gi-lbl">Ambassador Data Model</div></div><div class="gi-ov"><span class="gi-ov-txt">View Image</span></div></div><div style="height:12px"></div><h4>Ambassador Data Model</h4><p>Normalized types with indexed query fields. Commission rules stored as data records, not code branches.</p></div>
+      <div class="arch-card rv"><div class="arch-tag">Workflow Engine</div><div class="gi" data-lbl="Backend Workflow Chain" data-src="/images/sharpstakes/workflow-architecture.png"><div class="gi-ph"><div class="gi-icon">⚙</div><div class="gi-lbl">Backend Workflow Chain</div></div><div class="gi-ov"><span class="gi-ov-txt">View Image</span></div></div><div style="height:12px"></div><h4>Backend Workflow Chain</h4><p>Approval → calculation → payout → notification → audit. One atomic chain, zero page refreshes.</p></div>
+      <div class="arch-card rv"><div class="arch-tag">Real-Time Layer</div><div class="gi" data-lbl="Recursive Polling System" data-src="/images/sharpstakes/realtime-polling.png"><div class="gi-ph"><div class="gi-icon">⚡</div><div class="gi-lbl">Recursive Polling System</div></div><div class="gi-ov"><span class="gi-ov-txt">View Image</span></div></div><div style="height:12px"></div><h4>Recursive Polling System</h4><p>Self-triggering loop for live sportsbook data. Circuit breaker on API failure. No degradation over time.</p></div>
+      <div class="arch-card rv"><div class="arch-tag">Streak System</div><div class="gi" data-lbl="Weekly Streak Engine" data-src="/images/sharpstakes/streak-system.png"><div class="gi-ph"><div class="gi-icon">◈</div><div class="gi-lbl">Weekly Streak Engine</div></div><div class="gi-ov"><span class="gi-ov-txt">View Image</span></div></div><div style="height:12px"></div><h4>Weekly Streak Engine</h4><p>Scheduled backend calculation with timezone normalization. Continuation vs. reset determined server-side.</p></div>
+      <div class="arch-card rv"><div class="arch-tag">Admin Portal</div><div class="gi" data-lbl="Operator Dashboard" data-src="/images/sharpstakes/admin-portal.png"><div class="gi-ph"><div class="gi-icon">☰</div><div class="gi-lbl">Operator Dashboard</div></div><div class="gi-ov"><span class="gi-ov-txt">View Image</span></div></div><div style="height:12px"></div><h4>Operator Dashboard</h4><p>Pre-aggregated summary reads. Bulk operations via server-side list processing. Configurable time ranges.</p></div>
+      <div class="arch-card rv"><div class="arch-tag">Commission Engine</div><div class="gi" data-lbl="Rule-Based Commission" data-src="/images/sharpstakes/commission-engine.png"><div class="gi-ph"><div class="gi-icon">💰</div><div class="gi-lbl">Rule-Based Commission</div></div><div class="gi-ov"><span class="gi-ov-txt">View Image</span></div></div><div style="height:12px"></div><h4>Rule-Based Commission</h4><p>Data-driven rule table evaluated per submission. Operators configure rules without developer involvement.</p></div>
     </div>
   </div>
 </section>
@@ -426,19 +426,34 @@ if('IntersectionObserver' in window){
 }else{rvEls.forEach(function(el){el.classList.add('vis')})}
 setTimeout(function(){rvEls.forEach(function(el){el.classList.add('vis')})},3000);
 
-/* Architecture — preload images */
+/* Architecture — same logic as gallery */
 document.querySelectorAll('.arch-ph[data-src]').forEach(function(ph){
   var src=ph.getAttribute('data-src');
+  var lbl=ph.getAttribute('data-lbl')||'';
   if(!src) return;
   var img=new Image();
   img.onload=function(){
-    img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:7px';
-    img.alt=ph.querySelector('.arch-ph-txt') ? ph.querySelector('.arch-ph-txt').textContent : '';
-    var txt=ph.querySelector('.arch-ph-txt');
-    if(txt) txt.style.display='none';
+    img.alt=lbl;
+    img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:8px;opacity:.85;transition:opacity .3s;z-index:1';
+    var inner=ph.querySelector('.arch-ph-inner');
+    if(inner) inner.style.display='none';
     ph.appendChild(img);
+    ph.addEventListener('mouseenter',function(){img.style.opacity='1'});
+    ph.addEventListener('mouseleave',function(){img.style.opacity='.85'});
   };
   img.src=src;
+  ph.addEventListener('click',function(){
+    var c=document.getElementById('lb-content');
+    c.innerHTML='';
+    var li=new Image();
+    li.onload=function(){
+      li.style.cssText='max-width:88vw;max-height:85vh;border-radius:12px;object-fit:contain';
+      li.alt=lbl;c.style.background='none';c.style.border='none';c.appendChild(li);
+    };
+    li.onerror=function(){c.innerHTML='<div class="lb-name">'+lbl+'</div><div class="lb-path">'+src+'</div>'};
+    li.src=src;
+    lb.classList.add('active');document.body.style.overflow='hidden';
+  });
 });
 
 /* Gallery — preload images into cards */
