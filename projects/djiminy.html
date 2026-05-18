@@ -12,9 +12,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&family=JetBrains+Mono:wght@300;400;500&display=swap');
 :root{
   --bg:#09090b;--bg2:#0d0d10;--card:#131316;--card-h:#18181c;
-  --t1:#f0f0f2;--t2:#8a8a9a;--t3:#46464f;--t4:#2a2a30;
+  --t1:#f0f0f2;--t2:#a8a8b8;--t3:#6a6a7a;--t4:#38383f;
   --acc:#c8ff00;--acc-d:rgba(200,255,0,.1);--acc-m:rgba(200,255,0,.22);
-  --bdr:#1f1f24;--bdr-h:#2d2d34;
+  --bdr:#1f1f24;--bdr-h:#2e2e38;
   --grad:linear-gradient(135deg,#c8ff00 0%,#00ffc8 100%);
   --sf:'Instrument Serif',Georgia,serif;--sn:'DM Sans',-apple-system,system-ui,sans-serif;--mn:'JetBrains Mono',monospace;
   --eo:cubic-bezier(.16,1,.3,1);
@@ -492,9 +492,9 @@ footer{padding:24px 52px;border-top:1px solid var(--bdr);display:flex;justify-co
 
 <script>
 /* Reveal */
-var rvEls=document.querySelectorAll('.rv');
+var rvEls=document.querySelectorAll('.rv, .ch-list, .lifecycle-box, .arch-grid, .boarding-grid, .results-grid');
 if('IntersectionObserver' in window){
-  var o=new IntersectionObserver(function(e){e.forEach(function(i){if(i.isIntersecting){i.target.classList.add('vis');o.unobserve(i.target)}})},{threshold:.07});
+  var o=new IntersectionObserver(function(e){e.forEach(function(i){if(i.isIntersecting){i.target.classList.add('vis');o.unobserve(i.target)}})},{threshold:.06});
   rvEls.forEach(function(el){o.observe(el)});
 }else{rvEls.forEach(function(el){el.classList.add('vis')})}
 setTimeout(function(){rvEls.forEach(function(el){el.classList.add('vis')})},3000);

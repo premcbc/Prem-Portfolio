@@ -75,9 +75,26 @@ section.cs.alt{background:var(--bg2)}
 .s-body p:last-child{margin-bottom:0}
 .s-body strong{color:var(--t1);font-weight:500}
 
-/* REVEAL */
-.rv{opacity:0;transform:translateY(20px);transition:opacity .7s var(--eo),transform .7s var(--eo);will-change:opacity,transform}
+/* REVEAL — cinematic stagger */
+.rv{opacity:0;transform:translateY(18px);transition:opacity .8s var(--eo),transform .8s var(--eo);will-change:opacity,transform}
 .rv.vis{opacity:1;transform:none}
+/* challenge items stagger on vis parent */
+.ch-list.vis .ch-item:nth-child(1){animation:chIn .55s var(--eo) .05s both}
+.ch-list.vis .ch-item:nth-child(2){animation:chIn .55s var(--eo) .12s both}
+.ch-list.vis .ch-item:nth-child(3){animation:chIn .55s var(--eo) .19s both}
+.ch-list.vis .ch-item:nth-child(4){animation:chIn .55s var(--eo) .26s both}
+.ch-list.vis .ch-item:nth-child(5){animation:chIn .55s var(--eo) .33s both}
+.ch-list.vis .ch-item:nth-child(6){animation:chIn .55s var(--eo) .40s both}
+.ch-list.vis .ch-item:nth-child(7){animation:chIn .55s var(--eo) .47s both}
+.ch-list.vis .ch-item:nth-child(8){animation:chIn .55s var(--eo) .54s both}
+@keyframes chIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+/* arch + result grid stagger */
+.arch-grid .arch-card:nth-child(1),.results-grid .rc:nth-child(1){transition-delay:.04s}
+.arch-grid .arch-card:nth-child(2),.results-grid .rc:nth-child(2){transition-delay:.10s}
+.arch-grid .arch-card:nth-child(3),.results-grid .rc:nth-child(3){transition-delay:.16s}
+.arch-grid .arch-card:nth-child(4),.results-grid .rc:nth-child(4){transition-delay:.22s}
+.arch-grid .arch-card:nth-child(5){transition-delay:.28s}
+.arch-grid .arch-card:nth-child(6){transition-delay:.34s}
 
 /* OVERVIEW GRID */
 .ov-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:36px}
@@ -386,9 +403,9 @@ footer{padding:24px 52px;border-top:1px solid var(--bdr);display:flex;justify-co
 
 <script>
 /* Reveal */
-var rvEls=document.querySelectorAll('.rv');
+var rvEls=document.querySelectorAll('.rv, .ch-list, .arch-grid');
 if('IntersectionObserver' in window){
-  var o=new IntersectionObserver(function(e){e.forEach(function(i){if(i.isIntersecting){i.target.classList.add('vis');o.unobserve(i.target)}})},{threshold:.07});
+  var o=new IntersectionObserver(function(e){e.forEach(function(i){if(i.isIntersecting){i.target.classList.add('vis');o.unobserve(i.target)}})},{threshold:.06});
   rvEls.forEach(function(el){o.observe(el)});
 }else{rvEls.forEach(function(el){el.classList.add('vis')})}
 setTimeout(function(){rvEls.forEach(function(el){el.classList.add('vis')})},3000);
