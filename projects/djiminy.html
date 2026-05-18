@@ -438,12 +438,12 @@ footer{padding:24px 52px;border-top:1px solid var(--bdr);display:flex;justify-co
     <div class="s-tag rv">Architecture</div>
     <h2 class="s-title rv">System architecture</h2>
     <div class="arch-grid">
-      <div class="arch-card rv"><div class="arch-tag">Data Model</div><div class="arch-ph"><div class="arch-ph-txt">/images/djiminy/<br>data-model.png</div></div><h4>Inventory Data Architecture</h4><p>Separate types for bulk and serialized. Shared assignment and audit tables. RBAC via query-level constraints.</p></div>
-      <div class="arch-card rv"><div class="arch-tag">Lifecycle Flow</div><div class="arch-ph"><div class="arch-ph-txt">/images/djiminy/<br>lifecycle-flow.png</div></div><h4>State Transition Map</h4><p>Valid transitions defined per state. Backend guard prevents invalid jumps. Every transition triggers audit write atomically.</p></div>
-      <div class="arch-card rv"><div class="arch-tag">Boarding System</div><div class="arch-ph"><div class="arch-ph-txt">/images/djiminy/<br>boarding-workflow.png</div></div><h4>On/Offboarding Workflow</h4><p>Lock-protected boarding chains. All device dispositions handled server-side. User account state synchronized automatically.</p></div>
-      <div class="arch-card rv"><div class="arch-tag">Admin Dashboard</div><div class="arch-ph"><div class="arch-ph-txt">/images/djiminy/<br>admin-dashboard.png</div></div><h4>Operator View</h4><p>Pre-filtered by role. Inventory summary reads from aggregated fields. Warranty status pre-computed nightly.</p></div>
-      <div class="arch-card rv"><div class="arch-tag">Audit System</div><div class="arch-ph"><div class="arch-ph-txt">/images/djiminy/<br>audit-system.png</div></div><h4>Immutable Audit Logs</h4><p>Locked records on creation. Searchable by actor, device, action, date range. Full operational accountability.</p></div>
-      <div class="arch-card rv"><div class="arch-tag">Figma → Prod</div><div class="arch-ph"><div class="arch-ph-txt">/images/djiminy/<br>figma-designs.png</div></div><h4>Design-to-Production</h4><p>Full Figma system — components, states, admin screens — signed off before build. Consistent, fast delivery.</p></div>
+      <div class="arch-card rv"><div class="arch-tag">Data Model</div><div class="arch-ph" data-src="/images/djiminy/data-model.png"><div class="arch-ph-txt">Inventory Data Architecture</div></div><h4>Inventory Data Architecture</h4><p>Separate types for bulk and serialized. Shared assignment and audit tables. RBAC via query-level constraints.</p></div>
+      <div class="arch-card rv"><div class="arch-tag">Lifecycle Flow</div><div class="arch-ph" data-src="/images/djiminy/lifecycle-flow.png"><div class="arch-ph-txt">State Transition Map</div></div><h4>State Transition Map</h4><p>Valid transitions defined per state. Backend guard prevents invalid jumps. Every transition triggers audit write atomically.</p></div>
+      <div class="arch-card rv"><div class="arch-tag">Boarding System</div><div class="arch-ph" data-src="/images/djiminy/boarding-workflow.png"><div class="arch-ph-txt">On/Offboarding Workflow</div></div><h4>On/Offboarding Workflow</h4><p>Lock-protected boarding chains. All device dispositions handled server-side. User account state synchronized automatically.</p></div>
+      <div class="arch-card rv"><div class="arch-tag">Admin Dashboard</div><div class="arch-ph" data-src="/images/djiminy/admin-dashboard.png"><div class="arch-ph-txt">Operator View</div></div><h4>Operator View</h4><p>Pre-filtered by role. Inventory summary reads from aggregated fields. Warranty status pre-computed nightly.</p></div>
+      <div class="arch-card rv"><div class="arch-tag">Audit System</div><div class="arch-ph" data-src="/images/djiminy/audit-system.png"><div class="arch-ph-txt">Immutable Audit Logs</div></div><h4>Immutable Audit Logs</h4><p>Locked records on creation. Searchable by actor, device, action, date range. Full operational accountability.</p></div>
+      <div class="arch-card rv"><div class="arch-tag">Figma → Prod</div><div class="arch-ph" data-src="/images/djiminy/figma-designs.png"><div class="arch-ph-txt">Design-to-Production</div></div><h4>Design-to-Production</h4><p>Full Figma system — components, states, admin screens — signed off before build. Consistent, fast delivery.</p></div>
     </div>
   </div>
 </section>
@@ -453,7 +453,7 @@ footer{padding:24px 52px;border-top:1px solid var(--bdr);display:flex;justify-co
   <div class="wide">
     <div class="s-tag rv">Screenshots</div>
     <h2 class="s-title rv">Platform walkthrough</h2>
-    <div class="s-body rv"><p>Key screens from the Djiminy platform. Replace placeholder paths with real screenshots from <code>/images/djiminy/</code>.</p></div>
+    <div class="s-body rv"><p>Key screens from the Djiminy platform. Click any image to expand.</p></div>
     <div class="gallery-wrap">
     <div class="gallery rv">
       <div class="gi hero-gi" data-lbl="Inventory Dashboard" data-src="/images/djiminy/inventory-dashboard.png"><div class="gi-ph"><div class="gi-icon">📦</div><div class="gi-lbl">/images/djiminy/inventory-dashboard.png<br>Main Inventory Dashboard · Admin View</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
@@ -514,6 +514,21 @@ if('IntersectionObserver' in window){
 }else{rvEls.forEach(function(el){el.classList.add('vis')})}
 setTimeout(function(){rvEls.forEach(function(el){el.classList.add('vis')})},3000);
 
+/* Architecture — preload images */
+document.querySelectorAll('.arch-ph[data-src]').forEach(function(ph){
+  var src=ph.getAttribute('data-src');
+  if(!src) return;
+  var img=new Image();
+  img.onload=function(){
+    img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:7px';
+    img.alt=ph.querySelector('.arch-ph-txt') ? ph.querySelector('.arch-ph-txt').textContent : '';
+    var txt=ph.querySelector('.arch-ph-txt');
+    if(txt) txt.style.display='none';
+    ph.appendChild(img);
+  };
+  img.src=src;
+});
+
 /* Gallery — preload images into cards */
 document.querySelectorAll('.gi').forEach(function(gi){
   var src=gi.getAttribute('data-src');
@@ -522,11 +537,13 @@ document.querySelectorAll('.gi').forEach(function(gi){
   var img=new Image();
   img.onload=function(){
     img.alt=lbl;
-    img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px;opacity:.8;transition:opacity .3s';
+    img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px;opacity:.85;transition:opacity .3s;z-index:1';
     gi.style.position='relative';
+    var ph=gi.querySelector('.gi-ph');
+    if(ph) ph.style.display='none';
     gi.appendChild(img);
     gi.addEventListener('mouseenter',function(){img.style.opacity='1'});
-    gi.addEventListener('mouseleave',function(){img.style.opacity='.8'});
+    gi.addEventListener('mouseleave',function(){img.style.opacity='.85'});
   };
   img.src=src;
 });
