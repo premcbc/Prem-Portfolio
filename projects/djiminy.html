@@ -499,7 +499,24 @@ if('IntersectionObserver' in window){
 }else{rvEls.forEach(function(el){el.classList.add('vis')})}
 setTimeout(function(){rvEls.forEach(function(el){el.classList.add('vis')})},3000);
 
-/* Gallery + Lightbox */
+/* Gallery — preload images into cards */
+document.querySelectorAll('.gi').forEach(function(gi){
+  var src=gi.getAttribute('data-src');
+  var lbl=gi.getAttribute('data-lbl');
+  if(!src) return;
+  var img=new Image();
+  img.onload=function(){
+    img.alt=lbl;
+    img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:10px;opacity:.8;transition:opacity .3s';
+    gi.style.position='relative';
+    gi.appendChild(img);
+    gi.addEventListener('mouseenter',function(){img.style.opacity='1'});
+    gi.addEventListener('mouseleave',function(){img.style.opacity='.8'});
+  };
+  img.src=src;
+});
+
+/* Lightbox */
 var lb=document.getElementById('lb');
 document.querySelectorAll('.gi').forEach(function(gi){
   gi.addEventListener('click',function(){
@@ -507,10 +524,18 @@ document.querySelectorAll('.gi').forEach(function(gi){
     var c=document.getElementById('lb-content');
     c.innerHTML='';
     var img=new Image();
-    img.onload=function(){c.appendChild(img)};
-    img.onerror=function(){c.innerHTML='<div class="lb-name">'+lbl+'</div><div class="lb-path">'+src+'</div>'};
-    img.src=src;img.alt=lbl;
-    lb.classList.add('active');document.body.style.overflow='hidden';
+    img.onload=function(){
+      img.style.cssText='max-width:88vw;max-height:85vh;border-radius:12px;object-fit:contain';
+      img.alt=lbl;
+      c.style.background='none';c.style.border='none';
+      c.appendChild(img);
+    };
+    img.onerror=function(){
+      c.innerHTML='<div class="lb-name">'+lbl+'</div><div class="lb-path">'+src+'</div>';
+    };
+    img.src=src;
+    lb.classList.add('active');
+    document.body.style.overflow='hidden';
   });
 });
 function closeLb(){lb.classList.remove('active');document.body.style.overflow=''}
