@@ -150,20 +150,34 @@ section.cs.alt{background:var(--bg2)}
 .kw{color:var(--acc)}
 .cm{color:var(--t4)}
 
-/* GALLERY */
+/* GALLERY — desktop grid */
 .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:36px}
-.gallery.has-hero{grid-template-columns:repeat(3,1fr)}
-.gi{border-radius:11px;overflow:hidden;position:relative;cursor:pointer;border:1px solid var(--bdr);transition:all .4s var(--eo);aspect-ratio:16/10;background:var(--card)}
+.gi{border-radius:11px;overflow:hidden;position:relative;cursor:pointer;border:1px solid var(--bdr);transition:border-color .4s var(--eo),transform .4s var(--eo),box-shadow .4s var(--eo);aspect-ratio:16/10;background:var(--card-h)}
 .gi:hover{border-color:var(--bdr-h);transform:scale(1.025);box-shadow:0 20px 40px -10px rgba(0,0,0,.5)}
 .gi.hero-gi{grid-column:1/-1;aspect-ratio:21/9}
-.gi-ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:linear-gradient(145deg,var(--bg) 0%,var(--card-h) 100%)}
-.gi-icon{font-size:20px;opacity:.25}
-.gi-lbl{font-family:var(--mn);font-size:11px;color:var(--t3);text-align:center;padding:0 14px;line-height:1.5}
-.gi img{width:100%;height:100%;object-fit:cover;opacity:.75;transition:opacity .3s}
-.gi:hover img{opacity:1}
-.gi-ov{position:absolute;inset:0;background:rgba(9,9,11,.8);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;backdrop-filter:blur(4px)}
+/* placeholder — more visible */
+.gi-ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(145deg,#0e0e12 0%,#161619 100%)}
+.gi-icon{font-size:22px;opacity:.55}
+.gi-lbl{font-family:var(--mn);font-size:11px;color:var(--t2);text-align:center;padding:0 14px;line-height:1.6;opacity:.7}
+.gi-ov{position:absolute;inset:0;background:rgba(9,9,11,.75);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;backdrop-filter:blur(4px)}
 .gi:hover .gi-ov{opacity:1}
-.gi-ov-txt{font-family:var(--mn);font-size:12px;color:var(--acc)}
+.gi-ov-txt{font-family:var(--mn);font-size:12px;color:var(--acc);letter-spacing:.06em}
+
+/* GALLERY — mobile slider */
+@media(max-width:768px){
+  .gallery{
+    display:flex;overflow-x:auto;gap:12px;
+    scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;
+    padding-bottom:16px;margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px;
+    -ms-overflow-style:none;scrollbar-width:none;
+  }
+  .gallery::-webkit-scrollbar{display:none}
+  .gi{flex:0 0 78vw;max-width:320px;scroll-snap-align:start;aspect-ratio:16/10;transform:none!important}
+  .gi.hero-gi{flex:0 0 88vw;max-width:380px;aspect-ratio:16/10}
+  /* scroll hint fade on right edge */
+  .gallery-wrap{position:relative}
+  .gallery-wrap::after{content:'';position:absolute;top:0;right:0;width:48px;height:100%;background:linear-gradient(to left,var(--bg2),transparent);pointer-events:none}
+}
 
 /* RESULTS */
 .results-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:36px}
@@ -350,13 +364,15 @@ footer{padding:24px 52px;border-top:1px solid var(--bdr);display:flex;justify-co
     <div class="s-tag rv">Screenshots</div>
     <h2 class="s-title rv">Platform walkthrough</h2>
     <div class="s-body rv"><p>Key screens from the SharpStakes platform. Replace paths with real screenshots from <code>/images/sharpstakes/</code>. Click any image to expand.</p></div>
+    <div class="gallery-wrap">
     <div class="gallery rv has-hero">
-      <div class="gi hero-gi" data-lbl="Ambassador Dashboard" data-src="/images/sharpstakes/dashboard.png"><div class="gi-ph"><div class="gi-icon">🖥</div><div class="gi-lbl">/images/sharpstakes/dashboard.png — Ambassador Dashboard · Main View</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
+      <div class="gi hero-gi" data-lbl="Ambassador Dashboard" data-src="/images/sharpstakes/dashboard.png"><div class="gi-ph"><div class="gi-icon">🖥</div><div class="gi-lbl">/images/sharpstakes/dashboard.png<br>Ambassador Dashboard · Main View</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
       <div class="gi" data-lbl="Streak System" data-src="/images/sharpstakes/streak-system.png"><div class="gi-ph"><div class="gi-icon">🔥</div><div class="gi-lbl">/images/sharpstakes/<br>streak-system.png</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
       <div class="gi" data-lbl="Admin Portal" data-src="/images/sharpstakes/admin-portal.png"><div class="gi-ph"><div class="gi-icon">⚙</div><div class="gi-lbl">/images/sharpstakes/<br>admin-portal.png</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
       <div class="gi" data-lbl="Approval Queue" data-src="/images/sharpstakes/approval-queue.png"><div class="gi-ph"><div class="gi-icon">✓</div><div class="gi-lbl">/images/sharpstakes/<br>approval-queue.png</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
       <div class="gi" data-lbl="Analytics Dashboard" data-src="/images/sharpstakes/analytics.png"><div class="gi-ph"><div class="gi-icon">📊</div><div class="gi-lbl">/images/sharpstakes/<br>analytics.png</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
       <div class="gi" data-lbl="Commission Engine" data-src="/images/sharpstakes/commission.png"><div class="gi-ph"><div class="gi-icon">💰</div><div class="gi-lbl">/images/sharpstakes/<br>commission.png</div></div><div class="gi-ov"><span class="gi-ov-txt">View Screenshot</span></div></div>
+    </div>
     </div>
   </div>
 </section>
