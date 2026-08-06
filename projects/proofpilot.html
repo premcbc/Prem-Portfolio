@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProofPilot AI — AI Document Intelligence Case Study · Prem Chandar</title>
+<meta name="description" content="How I designed and built ProofPilot AI — a production AI document intelligence platform combining GPT-4.1 Vision OCR, fraud signal detection, risk scoring, and human-in-the-loop review workflows.">
+<meta name="keywords" content="AI Document Intelligence, OpenAI GPT-4, Document Review Automation, AI Automation Engineer, Prompt Engineering, Supabase, Next.js, Human-in-the-loop">
+<meta property="og:title" content="ProofPilot AI — AI Document Intelligence Platform">
+<meta property="og:description" content="Production AI system combining OCR, LLM-powered extraction, fraud signal detection, and human-in-the-loop review workflows.">
+<meta property="og:url" content="https://premchandar.dev/projects/proofpilot">
+<link rel="canonical" href="https://premchandar.dev/projects/proofpilot">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2309090b'/%3E%3Ctext x='2' y='24' font-family='Georgia%2C serif' font-size='18' font-weight='bold' fill='%23f0f0f2'%3EPC%3C/text%3E%3Ctext x='26' y='24' font-family='Georgia%2C serif' font-size='18' font-style='italic' fill='%23c8ff00'%3E.%3C/text%3E%3C/svg%3E">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&family=JetBrains+Mono:wght@300;400;500&display=swap');
+:root{
+  --bg:#09090b;--bg2:#0d0d10;--card:#111114;--card-h:#161619;
+  --t1:#f0f0f2;--t2:#a8a8b8;--t3:#6a6a7a;--t4:#38383f;
+  --acc:#c8ff00;--acc-d:rgba(200,255,0,.09);--acc-m:rgba(200,255,0,.2);
+  --bdr:#1c1c21;--bdr-h:#2e2e38;
+  --grad:linear-gradient(135deg,#c8ff00 0%,#00ffc8 100%);
+  --sf:'Instrument Serif',Georgia,serif;
+  --sn:'DM Sans',-apple-system,system-ui,sans-serif;
+  --mn:'JetBrains Mono',monospace;
+  --eo:cubic-bezier(.16,1,.3,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--t1);font-family:var(--sn);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--acc-d);color:var(--t1)}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:15px 56px;display:flex;justify-content:space-between;align-items:center;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);background:rgba(9,9,11,.88);border-bottom:1px solid var(--bdr)}
+.nav-logo{font-family:var(--sf);font-size:20px;flex-shrink:0}
+.nav-logo span{color:var(--acc)}
+.breadcrumb{display:flex;align-items:center;gap:8px;font-family:var(--mn);font-size:12px;color:var(--t3)}
+.breadcrumb a{transition:color .2s}.breadcrumb a:hover{color:var(--t1)}
+.bc-sep{color:var(--t4)}.bc-cur{color:var(--acc)}
+.nav-back{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:var(--t2);padding:8px 16px;border:1px solid var(--bdr);border-radius:100px;transition:all .3s var(--eo);white-space:nowrap}
+.nav-back:hover{border-color:var(--bdr-h);color:var(--t1);transform:translateX(-2px)}
+
+/* STICKY SECTION NAV */
+.section-nav{position:sticky;top:57px;z-index:90;background:rgba(9,9,11,.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--bdr);padding:0 56px;display:flex;gap:0;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none}
+.section-nav::-webkit-scrollbar{display:none}
+.sn-link{padding:14px 18px;font-family:var(--mn);font-size:12px;color:var(--t3);white-space:nowrap;border-bottom:2px solid transparent;transition:color .25s,border-color .25s;cursor:pointer;flex-shrink:0}
+.sn-link:hover{color:var(--t1)}
+.sn-link.active{color:var(--acc);border-bottom-color:var(--acc)}
+
+/* HERO */
+.cs-hero{min-height:92vh;display:flex;flex-direction:column;justify-content:flex-end;padding:140px 56px 72px;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(155deg,#04080e 0%,#070f1e 30%,#0a1830 60%,#060c18 100%)}
+.hero-glow-1{position:absolute;top:-20%;right:-5%;width:65%;height:110%;background:radial-gradient(ellipse at 80% 20%,rgba(200,255,0,.055) 0%,transparent 55%);pointer-events:none}
+.hero-glow-2{position:absolute;bottom:-10%;left:-10%;width:50%;height:70%;background:radial-gradient(ellipse at 10% 80%,rgba(0,255,200,.03) 0%,transparent 60%);pointer-events:none}
+.hero-noise{position:absolute;inset:0;opacity:.22;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none}
+.hero-content{position:relative;z-index:2}
+.cs-eyebrow{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.cs-eyebrow-line{width:26px;height:1px;background:var(--acc);flex-shrink:0}
+.cs-eyebrow-text{font-family:var(--mn);font-size:11px;color:var(--acc);letter-spacing:.14em;text-transform:uppercase}
+.cs-hero h1{font-family:var(--sf);font-size:clamp(48px,7vw,110px);font-weight:400;letter-spacing:-.03em;line-height:.97;margin-bottom:20px}
+.cs-hero h1 em{font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.cs-tagline{font-size:clamp(17px,2vw,23px);color:var(--t2);font-weight:400;letter-spacing:-.01em;margin-bottom:14px}
+.cs-byline{display:inline-flex;align-items:center;gap:8px;font-family:var(--mn);font-size:11px;color:var(--t3);letter-spacing:.04em;margin-bottom:28px}
+.cs-byline::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--acc)}
+.cs-subtitle{font-size:clamp(15px,1.5vw,19px);color:var(--t2);max-width:620px;line-height:1.75;margin-bottom:44px;font-weight:300}
+.cs-subtitle strong{color:var(--t1);font-weight:500}
+
+/* HERO TAGS */
+.hero-tag-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:40px}
+.htag{padding:5px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:100px;font-family:var(--mn);font-size:11px;color:rgba(255,255,255,.6)}
+.htag.ac{background:var(--acc-d);border-color:rgba(200,255,0,.3);color:var(--acc)}
+
+/* POSITIONING STATEMENT */
+.position-bar{display:flex;gap:0;border-top:1px solid rgba(255,255,255,.07);margin-top:8px}
+.pb-item{padding:20px 28px;border-right:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.pb-item:first-child{padding-left:0}
+.pb-item:last-child{border-right:none}
+.pb-label{font-family:var(--mn);font-size:10px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px}
+.pb-val{font-size:14px;font-weight:500;color:var(--t1)}
+
+/* SECTIONS */
+section.cs{padding:88px 56px}
+section.cs.alt{background:var(--bg2)}
+.inner{max-width:920px}
+.wide{max-width:1120px}
+.s-tag{font-family:var(--mn);font-size:11px;color:var(--acc);letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px}
+.s-title{font-family:var(--sf);font-size:clamp(28px,3.5vw,50px);font-weight:400;letter-spacing:-.025em;line-height:1.05;margin-bottom:24px}
+.s-body{font-size:15px;color:var(--t2);line-height:1.88;font-weight:300}
+.s-body p{margin-bottom:16px}
+.s-body p:last-child{margin-bottom:0}
+.s-body strong{color:var(--t1);font-weight:500}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(18px);transition:opacity .8s var(--eo),transform .8s var(--eo);will-change:opacity,transform}
+.rv.vis{opacity:1;transform:none}
+
+/* PROBLEM STATEMENT */
+.problem-card{margin-top:36px;padding:36px;background:var(--card);border:1px solid var(--bdr);border-radius:18px;border-left:3px solid var(--acc);position:relative;overflow:hidden}
+.problem-card::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 0% 50%,rgba(200,255,0,.04) 0%,transparent 60%);pointer-events:none}
+.problem-card-label{font-family:var(--mn);font-size:10px;color:var(--acc);letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px;opacity:.8}
+.problem-card p{font-size:15px;color:var(--t2);line-height:1.85;font-weight:300}
+.problem-card p strong{color:var(--t1);font-weight:500}
+
+/* SCREENSHOT SLOT */
+.ss-slot{width:100%;border-radius:16px;overflow:hidden;border:1px solid var(--bdr);background:linear-gradient(145deg,#0a0a0e 0%,#111115 100%);position:relative;cursor:pointer;transition:border-color .35s var(--eo),box-shadow .35s var(--eo)}
+.ss-slot:hover{border-color:var(--bdr-h);box-shadow:0 24px 48px -12px rgba(0,0,0,.5)}
+.ss-slot.ratio-169{aspect-ratio:16/9}
+.ss-slot.ratio-219{aspect-ratio:21/9}
+.ss-slot.ratio-43{aspect-ratio:4/3}
+.ss-ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:24px}
+.ss-ph-icon{font-size:24px;opacity:.4}
+.ss-ph-label{font-family:var(--mn);font-size:11px;color:var(--t2);text-align:center;line-height:1.6;opacity:.65}
+.ss-ph-path{font-family:var(--mn);font-size:10px;color:var(--t3);margin-top:4px;opacity:.5}
+.ss-ov{position:absolute;inset:0;background:rgba(9,9,11,.78);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;backdrop-filter:blur(4px);z-index:2}
+.ss-slot:hover .ss-ov{opacity:1}
+.ss-ov-txt{font-family:var(--mn);font-size:12px;color:var(--acc);letter-spacing:.06em}
+.ss-caption{margin-top:12px;font-family:var(--mn);font-size:11px;color:var(--t3);text-align:center;letter-spacing:.04em}
+
+/* SS GRID */
+.ss-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:36px}
+.ss-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:36px}
+
+/* PIPELINE */
+.pipeline{margin-top:40px;padding:36px;background:var(--card);border:1px solid var(--bdr);border-radius:18px}
+.pipeline-label{font-family:var(--mn);font-size:11px;color:var(--acc);letter-spacing:.1em;text-transform:uppercase;margin-bottom:28px}
+.pipeline-steps{display:flex;flex-direction:column;gap:0}
+.pipeline-step{display:grid;grid-template-columns:52px 1fr;gap:20px;padding:20px 0;border-bottom:1px solid var(--bdr);align-items:start;transition:background .25s;border-radius:4px;cursor:default}
+.pipeline-step:last-child{border-bottom:none}
+.pipeline-step:hover{background:rgba(200,255,0,.02)}
+.ps-num{display:flex;flex-direction:column;align-items:center;gap:0}
+.ps-circle{width:36px;height:36px;border-radius:50%;background:var(--acc-d);border:1px solid rgba(200,255,0,.2);display:flex;align-items:center;justify-content:center;font-family:var(--mn);font-size:12px;color:var(--acc);font-weight:500;flex-shrink:0}
+.ps-line{width:1px;flex:1;min-height:24px;background:var(--bdr);margin-top:6px}
+.pipeline-step:last-child .ps-line{display:none}
+.ps-content{padding-top:6px}
+.ps-title{font-size:15px;font-weight:500;margin-bottom:5px;letter-spacing:-.01em}
+.ps-desc{font-size:13px;color:var(--t2);line-height:1.65;font-weight:300}
+.ps-badge{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:3px 10px;background:var(--bg);border:1px solid var(--bdr);border-radius:100px;font-family:var(--mn);font-size:10px;color:var(--t3)}
+
+/* CHALLENGE */
+.eng-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;background:var(--acc-d);border:1px solid rgba(200,255,0,.25);border-radius:100px;font-family:var(--mn);font-size:11px;color:var(--acc);letter-spacing:.04em;margin-bottom:20px}
+.ch-list{margin-top:36px;border:1px solid var(--bdr-h);border-radius:18px;overflow:hidden;box-shadow:0 30px 60px -25px rgba(0,0,0,.55)}
+.ch-item{padding:34px 34px;border-bottom:1px solid var(--bdr);border-left:3px solid transparent;display:grid;grid-template-columns:52px 1fr;gap:22px;align-items:start;transition:background .3s,border-color .3s;cursor:default}
+.ch-item:last-child{border-bottom:none}
+.ch-item:hover{background:var(--card);border-left-color:var(--acc)}
+.ch-n{font-family:var(--sf);font-size:26px;color:var(--acc);opacity:.6;line-height:1;padding-top:2px}
+.ch-item h4{font-size:16.5px;font-weight:500;margin-bottom:8px;letter-spacing:-.01em}
+.ch-item p{font-size:14px;color:var(--t2);line-height:1.72;font-weight:300}
+.ch-item code{font-family:var(--mn);font-size:11px;color:var(--acc);background:var(--acc-d);padding:2px 7px;border-radius:4px}
+
+/* SIGNALS GRID */
+.signals-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:36px}
+.signal-card{padding:24px;background:var(--card);border:1px solid var(--bdr);border-radius:14px;transition:all .35s var(--eo);position:relative;overflow:hidden}
+.signal-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad);opacity:0;transition:opacity .35s}
+.signal-card:hover{border-color:var(--bdr-h);transform:translateY(-3px)}
+.signal-card:hover::after{opacity:1}
+.signal-icon{font-size:20px;margin-bottom:14px}
+.signal-card h4{font-size:14px;font-weight:500;margin-bottom:7px;letter-spacing:-.01em}
+.signal-card p{font-size:13px;color:var(--t2);line-height:1.62;font-weight:300}
+
+/* COPILOT SECTION */
+.copilot-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:36px}
+.copilot-card{padding:28px;background:var(--card);border:1px solid var(--bdr);border-radius:16px;transition:all .35s var(--eo);position:relative;overflow:hidden}
+.copilot-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 0% 0%,rgba(200,255,0,.05) 0%,transparent 65%);opacity:0;transition:opacity .4s}
+.copilot-card:hover{border-color:rgba(200,255,0,.2);transform:translateY(-3px)}
+.copilot-card:hover::before{opacity:1}
+.copilot-card-icon{width:40px;height:40px;border-radius:9px;background:var(--acc-d);display:flex;align-items:center;justify-content:center;margin-bottom:16px;font-size:16px;transition:background .35s;position:relative;z-index:1}
+.copilot-card:hover .copilot-card-icon{background:rgba(200,255,0,.16)}
+.copilot-card h4{font-size:15px;font-weight:500;margin-bottom:8px;position:relative;z-index:1;letter-spacing:-.01em}
+.copilot-card p{font-size:13px;color:var(--t2);line-height:1.68;font-weight:300;position:relative;z-index:1}
+
+/* HUMAN IN LOOP */
+.hitl-callout{margin-top:36px;padding:32px;background:linear-gradient(135deg,rgba(200,255,0,.05) 0%,transparent 100%);border:1px solid rgba(200,255,0,.15);border-radius:16px}
+.hitl-tag{font-family:var(--mn);font-size:10px;color:var(--acc);letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px;opacity:.85}
+.hitl-callout h4{font-family:var(--sf);font-size:22px;font-weight:400;margin-bottom:12px;letter-spacing:-.02em}
+.hitl-callout p{font-size:14px;color:var(--t2);line-height:1.78;font-weight:300}
+.hitl-callout p strong{color:var(--t1);font-weight:500}
+
+/* MY RESPONSIBILITIES */
+.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:36px}
+.role-item{display:flex;align-items:center;gap:12px;padding:16px 20px;background:var(--card);border:1px solid var(--bdr);border-radius:12px;transition:all .3s var(--eo)}
+.role-item:hover{border-color:rgba(200,255,0,.25);transform:translateY(-2px)}
+.role-dot{width:7px;height:7px;border-radius:50%;background:var(--acc);flex-shrink:0}
+.role-item span{font-size:13.5px;font-weight:500;color:var(--t1);letter-spacing:-.01em}
+
+/* METRICS STRIP */
+.metrics-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;margin-top:36px;background:var(--bdr);border:1px solid var(--bdr);border-radius:16px;overflow:hidden}
+.metric-cell{background:var(--card);padding:26px 20px;text-align:center}
+.metric-icon{font-size:18px;margin-bottom:12px;opacity:.85}
+.metric-txt{font-size:12.5px;color:var(--t2);line-height:1.5;font-weight:400}
+
+/* ARCHITECTURE FLOW DIAGRAM */
+.arch-flow{margin-top:36px;padding:40px 36px;background:var(--card);border:1px solid var(--bdr);border-radius:18px}
+.flow-steps{display:flex;flex-direction:column;align-items:center;gap:0}
+.flow-node{display:flex;align-items:center;gap:14px;width:100%;max-width:460px;padding:16px 22px;background:var(--bg);border:1px solid var(--bdr);border-radius:100px;transition:all .3s var(--eo)}
+.flow-node:hover{border-color:rgba(200,255,0,.3);background:var(--acc-d)}
+.flow-node-icon{font-size:16px;flex-shrink:0}
+.flow-node-txt{font-size:13.5px;font-weight:500;color:var(--t1);letter-spacing:-.01em}
+.flow-node-sub{font-family:var(--mn);font-size:10px;color:var(--t3);margin-top:2px}
+.flow-arrow{padding:8px 0;color:var(--t4);font-size:15px;line-height:1}
+.flow-arrow svg{display:block}
+
+/* ARCH CARDS — reuse gi pattern */
+.arch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:36px}
+.arch-card{padding:22px;background:var(--card);border:1px solid var(--bdr);border-radius:14px;position:relative;overflow:hidden;transition:all .35s var(--eo)}
+.arch-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad);opacity:0;transition:opacity .35s}
+.arch-card:hover{border-color:var(--bdr-h);transform:translateY(-3px)}
+.arch-card:hover::after{opacity:1}
+.arch-tag{font-family:var(--mn);font-size:10px;color:var(--acc);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.arch-card .gi{display:block;margin-bottom:12px}
+.arch-card h4{font-size:13px;font-weight:500;margin-bottom:5px;margin-top:0}
+.arch-card p{font-size:12px;color:var(--t2);line-height:1.58;font-weight:300}
+
+/* GALLERY — gi cards */
+.gi{border-radius:11px;overflow:hidden;position:relative;cursor:pointer;border:1px solid var(--bdr);transition:border-color .4s var(--eo),transform .4s var(--eo),box-shadow .4s var(--eo);aspect-ratio:16/10;background:linear-gradient(145deg,#0a0a0e 0%,#111115 100%)}
+.gi:hover{border-color:var(--bdr-h);transform:scale(1.025);box-shadow:0 20px 40px -10px rgba(0,0,0,.5)}
+.gi.hero-gi{aspect-ratio:21/9}
+.gi-ph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.gi-icon{font-size:22px;opacity:.55}
+.gi-lbl{font-family:var(--mn);font-size:11px;color:var(--t2);text-align:center;padding:0 14px;line-height:1.6;opacity:.7}
+.gi-ov{position:absolute;inset:0;background:rgba(9,9,11,.78);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;backdrop-filter:blur(4px);z-index:2}
+.gi:hover .gi-ov{opacity:1}
+.gi-ov-txt{font-family:var(--mn);font-size:12px;color:var(--acc);letter-spacing:.06em}
+
+/* OUTCOMES */
+.outcomes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:36px}
+.oc-card{padding:28px;background:var(--card);border:1px solid var(--bdr);border-radius:16px;transition:all .35s var(--eo)}
+.oc-card:hover{border-color:rgba(200,255,0,.25);transform:translateY(-4px);background:var(--card-h)}
+.oc-icon{font-size:22px;margin-bottom:16px}
+.oc-card h4{font-size:14px;font-weight:500;margin-bottom:8px;letter-spacing:-.01em}
+.oc-card p{font-size:13px;color:var(--t2);line-height:1.65;font-weight:300}
+
+/* TECH STACK */
+.tech-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:36px}
+.tech-card{padding:20px;background:var(--card);border:1px solid var(--bdr);border-radius:14px;text-align:center;transition:all .3s var(--eo)}
+.tech-card:hover{border-color:var(--bdr-h);transform:translateY(-3px)}
+.tech-icon{font-size:22px;margin-bottom:10px}
+.tech-name{font-size:13px;font-weight:500;margin-bottom:4px}
+.tech-role{font-family:var(--mn);font-size:10px;color:var(--t3);line-height:1.5}
+
+/* TECH STACK — CATEGORIZED */
+.tech-cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:36px}
+.tech-cat{padding:24px;background:var(--card);border:1px solid var(--bdr);border-radius:16px;transition:all .3s var(--eo)}
+.tech-cat:hover{border-color:var(--bdr-h)}
+.tech-cat-head{display:flex;align-items:center;gap:9px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--bdr)}
+.tech-cat-icon{font-size:16px}
+.tech-cat-name{font-family:var(--mn);font-size:11px;color:var(--acc);letter-spacing:.1em;text-transform:uppercase}
+.tech-cat-list{display:flex;flex-direction:column;gap:12px}
+.tech-cat-item-name{font-size:13.5px;font-weight:500;color:var(--t1);letter-spacing:-.01em}
+.tech-cat-item-role{font-family:var(--mn);font-size:10px;color:var(--t3);margin-top:3px;line-height:1.5}
+
+/* LIGHTBOX */
+.lb{position:fixed;inset:0;background:rgba(9,9,11,.97);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);z-index:500;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s var(--eo);padding:20px}
+.lb.active{opacity:1;pointer-events:auto}
+.lb-close{position:absolute;top:20px;right:20px;width:42px;height:42px;border-radius:50%;background:var(--card);border:1px solid var(--bdr);color:var(--t2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;font-size:17px}
+.lb-close:hover{border-color:var(--acc);color:var(--acc)}
+.lb-ph{width:min(88vw,1080px);max-height:85vh;background:var(--card);border:1px solid var(--bdr);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;overflow:hidden}
+.lb-ph img{width:100%;height:100%;object-fit:contain;border-radius:11px}
+.lb-name{font-size:15px;font-weight:500}
+
+/* NEXT BAR */
+.next-bar{padding:64px 56px;background:var(--bg2);border-top:1px solid var(--bdr)}
+.next-inner{display:flex;justify-content:space-between;align-items:center;gap:24px;max-width:920px}
+.next-lbl{font-family:var(--mn);font-size:11px;color:var(--t3);margin-bottom:7px}
+.next-title{font-family:var(--sf);font-size:clamp(22px,3vw,34px);font-weight:400;letter-spacing:-.02em}
+.next-btn{display:inline-flex;align-items:center;gap:9px;padding:13px 26px;background:var(--acc);color:var(--bg);font-size:13px;font-weight:600;border-radius:100px;transition:all .3s var(--eo);white-space:nowrap;flex-shrink:0}
+.next-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px var(--acc-m)}
+
+footer{padding:24px 56px;border-top:1px solid var(--bdr);display:flex;justify-content:space-between;align-items:center;gap:16px}
+.fl{font-size:12px;color:var(--t3);font-family:var(--mn)}
+.fl a{color:var(--t3);transition:color .2s}.fl a:hover{color:var(--acc)}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .arch-grid{grid-template-columns:repeat(2,1fr)}
+  .signals-grid{grid-template-columns:repeat(2,1fr)}
+  .outcomes-grid{grid-template-columns:repeat(2,1fr)}
+  .tech-grid{grid-template-columns:repeat(2,1fr)}
+  .tech-cat-grid{grid-template-columns:repeat(2,1fr)}
+  .role-grid{grid-template-columns:repeat(2,1fr)}
+  .metrics-strip{grid-template-columns:repeat(3,1fr)}
+  .copilot-grid{grid-template-columns:1fr}
+  .ss-grid-2,.ss-grid-3{grid-template-columns:1fr 1fr}
+}
+@media(max-width:768px){
+  nav{padding:13px 22px}.breadcrumb{display:none}
+  .section-nav{padding:0 22px}.sn-link{padding:12px 12px;font-size:11px}
+  .cs-hero{padding:110px 22px 52px}
+  section.cs{padding:68px 22px}
+  .arch-grid,.signals-grid,.outcomes-grid{grid-template-columns:1fr}
+  .tech-grid{grid-template-columns:repeat(2,1fr)}
+  .tech-cat-grid{grid-template-columns:1fr}
+  .role-grid{grid-template-columns:1fr}
+  .metrics-strip{grid-template-columns:repeat(2,1fr)}
+  .arch-flow{padding:28px 18px}
+  .flow-node{max-width:100%}
+  .ss-grid-2,.ss-grid-3{grid-template-columns:1fr}
+  .position-bar{flex-wrap:wrap}
+  .pb-item{border-right:none;border-bottom:1px solid rgba(255,255,255,.07);width:50%}
+  .next-bar{padding:48px 22px}
+  .next-inner{flex-direction:column;align-items:flex-start}
+  footer{flex-direction:column;gap:8px;text-align:center;padding:18px 22px}
+  .copilot-grid{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  .cs-hero h1{font-size:clamp(38px,12vw,62px)}
+  .hero-tag-row{gap:6px}
+  .tech-grid{grid-template-columns:1fr 1fr}
+  .metrics-strip{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="../index.html" class="nav-logo">prem<span>.</span></a>
+  <div class="breadcrumb">
+    <a href="../index.html">Home</a><span class="bc-sep">/</span>
+    <a href="../index.html#work">Case Studies</a><span class="bc-sep">/</span>
+    <span class="bc-cur">ProofPilot AI</span>
+  </div>
+  <a href="../index.html#work" class="nav-back">
+    <svg width="13" height="13" fill="none"><path d="M8.5 3L4 6.5l4.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    All Work
+  </a>
+</nav>
+
+<div class="section-nav" id="sectionNav" role="navigation" aria-label="Page sections">
+  <a class="sn-link" data-target="problem">Problem</a>
+  <a class="sn-link" data-target="solution">Solution</a>
+  <a class="sn-link" data-target="role">My Role</a>
+  <a class="sn-link" data-target="architecture">Architecture</a>
+  <a class="sn-link" data-target="pipeline">AI Pipeline</a>
+  <a class="sn-link" data-target="signals">Fraud Signals</a>
+  <a class="sn-link" data-target="copilot">AI Copilot</a>
+  <a class="sn-link" data-target="engineering">Engineering</a>
+  <a class="sn-link" data-target="screenshots">Screenshots</a>
+  <a class="sn-link" data-target="outcomes">Outcomes</a>
+  <a class="sn-link" data-target="stack">Stack</a>
+</div>
+
+<!-- HERO -->
+<section class="cs-hero">
+  <div class="hero-bg"></div>
+  <div class="hero-glow-1"></div>
+  <div class="hero-glow-2"></div>
+  <div class="hero-noise"></div>
+  <div class="hero-content">
+    <div class="cs-eyebrow">
+      <div class="cs-eyebrow-line"></div>
+      <div class="cs-eyebrow-text">AI Product Engineering · BuildFlow · 2024–Present</div>
+    </div>
+    <h1>ProofPilot <em>AI</em></h1>
+    <div class="cs-tagline">An AI Document Intelligence Platform</div>
+    <div class="cs-byline">Designed &amp; engineered end-to-end by Prem Chandar</div>
+    <p class="cs-subtitle">
+      Automates business document verification — combining GPT-4.1 Vision OCR, LLM-powered structured extraction, fraud signal detection, and risk scoring with a <strong>human-in-the-loop review workflow</strong> that keeps reviewers in control of every final decision.
+    </p>
+    <div class="hero-tag-row">
+      <span class="htag ac">AI Document Intelligence</span>
+      <span class="htag">OpenAI GPT-4.1 Vision</span>
+      <span class="htag">Next.js</span>
+      <span class="htag">Supabase</span>
+      <span class="htag">Prompt Engineering</span>
+      <span class="htag">Fraud Signal Detection</span>
+      <span class="htag">Human-in-the-Loop</span>
+      <span class="htag">Workflow Automation</span>
+    </div>
+    <div class="position-bar">
+      <div class="pb-item"><div class="pb-label">Client</div><div class="pb-val">BuildFlow</div></div>
+      <div class="pb-item"><div class="pb-label">Role</div><div class="pb-val">AI Product Engineer</div></div>
+      <div class="pb-item"><div class="pb-label">Timeline</div><div class="pb-val">2024 – Present</div></div>
+      <div class="pb-item"><div class="pb-label">Type</div><div class="pb-val">Production AI System</div></div>
+      <div class="pb-item"><div class="pb-label">Status</div><div class="pb-val">Live</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- HERO SCREENSHOT -->
+<section class="cs alt" id="hero-ss" style="padding-top:56px;padding-bottom:56px;position:relative">
+  <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,var(--bdr-h) 20%,var(--bdr-h) 80%,transparent 100%)"></div>
+  <div class="wide" style="padding-bottom:0">
+    <div class="s-tag rv" style="margin-bottom:20px">Product Preview</div>
+    <div class="ss-slot ratio-219 rv" data-lbl="ProofPilot AI — Dashboard Overview" data-src="/images/proofpilot/dashboard-overview.png">
+      <div class="ss-ph">
+        <div class="ss-ph-icon">🖥</div>
+        <div class="ss-ph-label">ProofPilot AI — Main Dashboard</div>
+        <div class="ss-ph-path">/images/proofpilot/dashboard-overview.png</div>
+      </div>
+      <div class="ss-ov"><span class="ss-ov-txt">View Screenshot</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="cs" id="problem" style="padding-top:32px">
+  <div class="inner">
+    <div class="s-tag rv">The Business Problem</div>
+    <h2 class="s-title rv">Manual document review doesn't scale</h2>
+    <div class="s-body rv">
+      <p>Business document verification is a fundamentally manual process. A reviewer receives a document, reads it in full, extracts relevant information, checks for inconsistencies, assesses completeness, and makes an approval decision. For organizations processing significant document volumes, this creates real operational problems: time-intensive review cycles, inconsistent decisions across reviewers, and no standardized way to surface potential issues before human judgment is applied.</p>
+      <p>The problem isn't that humans make bad decisions. It's that <strong>humans are doing work that should be automated</strong> — and when reviewers are spending the majority of their time manually reading and extracting information, they have less capacity for the judgment-intensive work that actually requires human intelligence.</p>
+    </div>
+    <div class="problem-card rv">
+      <div class="problem-card-label">Core Insight</div>
+      <p>The goal wasn't to replace human judgment — it was to <strong>eliminate the manual work that precedes it</strong>. ProofPilot automates document reading, information extraction, and inconsistency detection so that reviewers arrive at the decision stage with structured information already in front of them, not a raw document they have to interpret from scratch.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="cs alt" id="solution">
+  <div class="inner">
+    <div class="s-tag rv">The Solution</div>
+    <h2 class="s-title rv">AI-assisted review, human-controlled decisions</h2>
+    <div class="s-body rv">
+      <p>ProofPilot is an <strong>AI document intelligence platform</strong> designed for business document verification. It processes uploaded documents through a multi-stage AI pipeline — OCR, structured extraction, fraud signal detection, risk scoring, and AI-generated review recommendations — before presenting structured findings to a human reviewer.</p>
+      <p>The platform supports a wide range of business document types: registration documents, identity verification, certificates, compliance documents, and financial supporting materials. It is <strong>document-type agnostic</strong> — the extraction workflow is configurable, meaning new document categories can be supported without rebuilding the core system.</p>
+      <p>Every decision remains with the reviewer. ProofPilot accelerates and standardizes the path to that decision — it does not replace it.</p>
+    </div>
+
+    <div class="ss-grid-2 rv">
+      <div>
+        <div class="ss-slot ratio-43" data-lbl="Document Upload Interface" data-src="/images/proofpilot/document-upload.png">
+          <div class="ss-ph"><div class="ss-ph-icon">📤</div><div class="ss-ph-label">Document Upload Interface</div><div class="ss-ph-path">/images/proofpilot/document-upload.png</div></div>
+          <div class="ss-ov"><span class="ss-ov-txt">View Screenshot</span></div>
+        </div>
+        <div class="ss-caption">Document upload &amp; intake</div>
+      </div>
+      <div>
+        <div class="ss-slot ratio-43" data-lbl="Document Queue / Review List" data-src="/images/proofpilot/review-queue.png">
+          <div class="ss-ph"><div class="ss-ph-icon">📋</div><div class="ss-ph-label">Document Queue &amp; Review List</div><div class="ss-ph-path">/images/proofpilot/review-queue.png</div></div>
+          <div class="ss-ov"><span class="ss-ov-txt">View Screenshot</span></div>
+        </div>
+        <div class="ss-caption">Review queue &amp; document management</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MY RESPONSIBILITIES -->
+<section class="cs" id="role">
+  <div class="inner">
+    <div class="s-tag rv">My Role</div>
+    <h2 class="s-title rv">What I owned, end to end</h2>
+    <div class="s-body rv">
+      <p>ProofPilot was designed and built by me, solo, for BuildFlow — from the first architecture decision to the production deployment. No handoffs, no separate design team. Here's what that covered:</p>
+    </div>
+    <div class="role-grid rv">
+      <div class="role-item"><span class="role-dot"></span><span>Product Architecture</span></div>
+      <div class="role-item"><span class="role-dot"></span><span>AI Workflow Design</span></div>
+      <div class="role-item"><span class="role-dot"></span><span>Prompt Engineering</span></div>
+      <div class="role-item"><span class="role-dot"></span><span>Backend Development</span></div>
+      <div class="role-item"><span class="role-dot"></span><span>Bubble.io Development</span></div>
+      <div class="role-item"><span class="role-dot"></span><span>API Integrations</span></div>
+      <div class="role-item"><span class="role-dot"></span><span>Database Design</span></div>
+      <div class="role-item"><span class="role-dot"></span><span>UI/UX</span></div>
+      <div class="role-item"><span class="role-dot"></span><span>Deployment</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section class="cs alt" id="architecture">
+  <div class="inner">
+    <div class="s-tag rv">System Architecture</div>
+    <h2 class="s-title rv">How a document moves through the system</h2>
+    <div class="s-body rv">
+      <p>Every stage is independently replaceable, allowing OCR models, extraction strategies, and validation logic to evolve without redesigning the overall pipeline.</p>
+      <p>Before the stage-by-stage breakdown, here's the system at a glance — a single upload traveling through nine architectural layers before it reaches an auditable decision.</p>
+    </div>
+    <div class="arch-flow rv">
+      <div class="flow-steps">
+        <div class="flow-node"><span class="flow-node-icon">📤</span><span class="flow-node-txt">Upload</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node"><span class="flow-node-icon">🗄</span><span class="flow-node-txt">Supabase Storage</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node"><span class="flow-node-icon">👁</span><span class="flow-node-txt">GPT-4.1 Vision OCR</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node"><span class="flow-node-icon">⬡</span><span class="flow-node-txt">Extraction Engine</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node"><span class="flow-node-icon">✅</span><span class="flow-node-txt">Validation Rules</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node"><span class="flow-node-icon">📊</span><span class="flow-node-txt">Risk Scoring</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node"><span class="flow-node-icon">🤖</span><span class="flow-node-txt">AI Copilot</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node"><span class="flow-node-icon">👤</span><span class="flow-node-txt">Human Review</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node"><span class="flow-node-icon">📜</span><span class="flow-node-txt">Audit Trail</span></div>
+      </div>
+    </div>
+    <div class="metrics-strip rv">
+      <div class="metric-cell"><div class="metric-icon">⚙️</div><div class="metric-txt">Multi-stage AI processing pipeline</div></div>
+      <div class="metric-cell"><div class="metric-icon">🔢</div><div class="metric-txt">Eight-step document verification workflow</div></div>
+      <div class="metric-cell"><div class="metric-icon">👤</div><div class="metric-txt">Human-in-the-loop review architecture</div></div>
+      <div class="metric-cell"><div class="metric-icon">⬡</div><div class="metric-txt">Configurable document-type support</div></div>
+      <div class="metric-cell"><div class="metric-icon">📜</div><div class="metric-txt">Immutable audit trail</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- AI PIPELINE -->
+<section class="cs" id="pipeline">
+  <div class="inner">
+    <div class="s-tag rv">AI Processing Pipeline</div>
+    <h2 class="s-title rv">From document upload to review-ready</h2>
+    <div class="s-body rv">
+      <p>Every document uploaded to ProofPilot moves through a structured AI processing pipeline before a reviewer sees it. Each stage has a specific function — and each feeds structured data into the next. The result is that by the time a document reaches a human reviewer, the raw document has been transformed into an organized, queryable set of findings.</p>
+    </div>
+    <div class="pipeline rv">
+      <div class="pipeline-label">Processing Pipeline — Stage by Stage</div>
+      <div class="pipeline-steps">
+        <div class="pipeline-step">
+          <div class="ps-num"><div class="ps-circle">01</div><div class="ps-line"></div></div>
+          <div class="ps-content">
+            <div class="ps-title">Document Upload &amp; Secure Storage</div>
+            <div class="ps-desc">Document is uploaded and stored in Supabase Storage with signed URL access control. No document is publicly accessible — all retrieval happens through time-limited signed URLs generated per request.</div>
+            <span class="ps-badge">Supabase Storage · Signed URLs</span>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-num"><div class="ps-circle">02</div><div class="ps-line"></div></div>
+          <div class="ps-content">
+            <div class="ps-title">OCR Processing</div>
+            <div class="ps-desc">GPT-4.1 Vision processes the document image, extracting raw text content from documents regardless of scan quality or layout variation. Confidence indicators are captured at this stage to inform downstream handling.</div>
+            <span class="ps-badge">GPT-4.1 Vision · OCR</span>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-num"><div class="ps-circle">03</div><div class="ps-line"></div></div>
+          <div class="ps-content">
+            <div class="ps-title">Structured Field Extraction</div>
+            <div class="ps-desc">OpenAI processes the OCR output against a prompt-engineered extraction schema, returning structured JSON with named fields, values, confidence scores, and extraction quality indicators. Prompt engineering ensures consistent output structure across variable document formats.</div>
+            <span class="ps-badge">OpenAI API · Prompt Engineering · Structured JSON</span>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-num"><div class="ps-circle">04</div><div class="ps-line"></div></div>
+          <div class="ps-content">
+            <div class="ps-title">Fraud Signal Detection</div>
+            <div class="ps-desc">Extracted fields are evaluated against a set of configurable validation rules — checking for missing required fields, inconsistent values, unexpected document structure, low-confidence extractions, and AI-identified anomalies. Signals are logged, not decisions — every flag requires human review.</div>
+            <span class="ps-badge">Validation Rules · Signal Detection</span>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-num"><div class="ps-circle">05</div><div class="ps-line"></div></div>
+          <div class="ps-content">
+            <div class="ps-title">Risk Scoring</div>
+            <div class="ps-desc">A composite risk score is calculated from the number and severity of detected signals. The score categorizes documents — surfacing high-signal documents for priority review without making any approval judgment.</div>
+            <span class="ps-badge">Risk Scoring · Prioritization</span>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-num"><div class="ps-circle">06</div><div class="ps-line"></div></div>
+          <div class="ps-content">
+            <div class="ps-title">AI Copilot Recommendations</div>
+            <div class="ps-desc">The AI Copilot synthesizes pipeline findings into a structured review brief: document summary, extracted fields, identified signals, confidence indicators, suggested focus areas, and recommended next actions. This is the artifact the human reviewer reads instead of the raw document.</div>
+            <span class="ps-badge">AI Copilot · Review Brief · OpenAI</span>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-num"><div class="ps-circle">07</div><div class="ps-line"></div></div>
+          <div class="ps-content">
+            <div class="ps-title">Human Review &amp; Final Decision</div>
+            <div class="ps-desc">The reviewer receives a structured review screen with all AI findings — extracted fields, signals, risk score, Copilot brief — alongside the original document. The reviewer assesses the AI findings, may review the source document directly, and makes the final approval or rejection decision.</div>
+            <span class="ps-badge">Human-in-the-Loop · Review Workflow</span>
+          </div>
+        </div>
+        <div class="pipeline-step">
+          <div class="ps-num"><div class="ps-circle">08</div><div class="ps-line"></div></div>
+          <div class="ps-content">
+            <div class="ps-title">Audit History</div>
+            <div class="ps-desc">Every processing event, reviewer action, and decision is logged immutably. The audit trail captures who reviewed, what AI findings were presented, what decision was made, and when — creating a complete, queryable history for every document processed.</div>
+            <span class="ps-badge">Audit Trail · Supabase</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:28px">
+      <div class="ss-slot ratio-169 rv" data-lbl="AI Processing Pipeline — Status View" data-src="/images/proofpilot/pipeline-status.png">
+        <div class="ss-ph"><div class="ss-ph-icon">⚡</div><div class="ss-ph-label">AI Processing Pipeline — Status View</div><div class="ss-ph-path">/images/proofpilot/pipeline-status.png</div></div>
+        <div class="ss-ov"><span class="ss-ov-txt">View Screenshot</span></div>
+      </div>
+      <div class="ss-caption">Pipeline processing status per document</div>
+    </div>
+  </div>
+</section>
+
+<!-- FRAUD SIGNALS -->
+<section class="cs alt" id="signals">
+  <div class="inner" style="max-width:1100px">
+    <div class="s-tag rv">Fraud Signal Detection</div>
+    <h2 class="s-title rv">Flagging inconsistencies, not making decisions</h2>
+    <div class="s-body rv">
+      <p>ProofPilot's fraud signal system is deliberately designed as an <strong>alerting layer, not a decision layer</strong>. It identifies and surfaces potential inconsistencies that warrant human attention — it does not approve or reject documents. Every signal is a flag for a reviewer, not an automated verdict.</p>
+    </div>
+    <div class="signals-grid rv">
+      <div class="signal-card">
+        <div class="signal-icon">⚠️</div>
+        <h4>Missing Required Fields</h4>
+        <p>Fields expected for the document type are absent or empty in extraction output. Reviewer is prompted to verify whether the field exists in the source document or is genuinely absent.</p>
+      </div>
+      <div class="signal-card">
+        <div class="signal-icon">🔍</div>
+        <h4>Low-Confidence OCR Extraction</h4>
+        <p>Confidence scores below threshold on specific field extractions — indicating unclear scan quality, damaged content, or unusual formatting that reduced AI extraction reliability.</p>
+      </div>
+      <div class="signal-card">
+        <div class="signal-icon">📄</div>
+        <h4>Missing Pages</h4>
+        <p>Expected page count for a document type is not met. The system flags incomplete document submissions so reviewers can request complete documentation before proceeding.</p>
+      </div>
+      <div class="signal-card">
+        <div class="signal-icon">⚡</div>
+        <h4>Inconsistent Field Values</h4>
+        <p>Values extracted from different parts of the same document contradict each other — dates that don't align, names that differ across sections, or numbers that don't reconcile.</p>
+      </div>
+      <div class="signal-card">
+        <div class="signal-icon">🏗</div>
+        <h4>Invalid Document Structure</h4>
+        <p>Document does not match the expected structural pattern for its declared type. Headers, sections, or formatting conventions that differ significantly from expected patterns.</p>
+      </div>
+      <div class="signal-card">
+        <div class="signal-icon">🤖</div>
+        <h4>AI-Identified Anomalies</h4>
+        <p>AI identifies patterns or content that fall outside expected norms for the document type — flagged for human review without categorical classification as fraudulent.</p>
+      </div>
+    </div>
+    <div style="margin-top:28px">
+      <div class="ss-slot ratio-169 rv" data-lbl="Fraud Signal Detection — Review Panel" data-src="/images/proofpilot/fraud-signals.png">
+        <div class="ss-ph"><div class="ss-ph-icon">🚨</div><div class="ss-ph-label">Fraud Signal Detection — Review Panel</div><div class="ss-ph-path">/images/proofpilot/fraud-signals.png</div></div>
+        <div class="ss-ov"><span class="ss-ov-txt">View Screenshot</span></div>
+      </div>
+      <div class="ss-caption">Detected signals surfaced for human review</div>
+    </div>
+  </div>
+</section>
+
+<!-- AI COPILOT -->
+<section class="cs" id="copilot">
+  <div class="inner">
+    <div class="s-tag rv">AI Copilot</div>
+    <h2 class="s-title rv">Structured intelligence for the reviewer</h2>
+    <div class="s-body rv">
+      <p>The AI Copilot is the interface between the AI pipeline and the human reviewer. Instead of reading a raw document, the reviewer receives a <strong>structured review brief</strong> — synthesized by AI from all pipeline findings — that tells them exactly what the document contains, what needs attention, and what to verify.</p>
+    </div>
+    <div class="copilot-grid rv">
+      <div class="copilot-card">
+        <div class="copilot-card-icon">📝</div>
+        <h4>AI Document Summary</h4>
+        <p>A concise, AI-generated summary of what the document is, what it contains, and its overall completeness — written for a reviewer who needs context in seconds, not minutes.</p>
+      </div>
+      <div class="copilot-card">
+        <div class="copilot-card-icon">⬡</div>
+        <h4>Structured Field Extraction</h4>
+        <p>All extracted fields presented in structured format — with values, confidence levels, and extraction quality indicators — so reviewers see organized data rather than raw document text.</p>
+      </div>
+      <div class="copilot-card">
+        <div class="copilot-card-icon">⚠️</div>
+        <h4>Missing &amp; Incomplete Information</h4>
+        <p>Explicit listing of fields that could not be extracted, fields with low confidence, and information that appears to be absent from the document — prioritized for reviewer attention.</p>
+      </div>
+      <div class="copilot-card">
+        <div class="copilot-card-icon">🔍</div>
+        <h4>Potential Inconsistencies</h4>
+        <p>AI-identified contradictions, mismatches, and anomalies presented clearly — with specific references to which fields or sections triggered the signal and why.</p>
+      </div>
+      <div class="copilot-card">
+        <div class="copilot-card-icon">📊</div>
+        <h4>Confidence Indicators</h4>
+        <p>Per-field and overall confidence scores so reviewers understand which extractions the AI is certain about and which warrant manual verification against the source document.</p>
+      </div>
+      <div class="copilot-card">
+        <div class="copilot-card-icon">◈</div>
+        <h4>Review Focus &amp; Next Actions</h4>
+        <p>Suggested areas for the reviewer to focus their manual review, and recommended next actions — not as binding instructions, but as AI-assisted guidance to accelerate decision-making.</p>
+      </div>
+    </div>
+    <div class="hitl-callout rv">
+      <div class="hitl-tag">Human-in-the-Loop — Core Design Principle</div>
+      <h4>AI accelerates the review. Humans make the decision.</h4>
+      <p>ProofPilot was designed with a non-negotiable principle: <strong>the final approval or rejection of any document is always made by a human reviewer.</strong> The AI Copilot is an intelligence layer — it surfaces information, flags concerns, and structures findings. It does not approve, reject, or automate decisions. This design ensures accountability, accuracy, and the ability to catch cases where AI extraction or signal detection may be incorrect. The human reviewer sees all AI findings and can always verify against the source document before deciding.</p>
+    </div>
+    <div style="margin-top:28px">
+      <div class="ss-slot ratio-169 rv" data-lbl="AI Copilot — Review Interface" data-src="/images/proofpilot/copilot-review.png">
+        <div class="ss-ph"><div class="ss-ph-icon">🤖</div><div class="ss-ph-label">AI Copilot — Review Interface</div><div class="ss-ph-path">/images/proofpilot/copilot-review.png</div></div>
+        <div class="ss-ov"><span class="ss-ov-txt">View Screenshot</span></div>
+      </div>
+      <div class="ss-caption">AI Copilot review brief presented to the human reviewer</div>
+    </div>
+  </div>
+</section>
+
+<!-- ENGINEERING CHALLENGES -->
+<section class="cs alt" id="engineering">
+  <div class="inner">
+    <div class="s-tag rv">Engineering Decisions &amp; Challenges</div>
+    <h2 class="s-title rv">Key Engineering Decisions</h2>
+    <div class="s-body rv">
+      <p>Most portfolios show screenshots. Very few explain why the system is built the way it is. Building a production AI document intelligence system requires solving problems that don't appear in tutorials — these are the six that defined how ProofPilot was engineered.</p>
+    </div>
+    <div class="eng-badge rv">⚙️ Why, not just what</div>
+    <div class="ch-list rv">
+      <div class="ch-item">
+        <div class="ch-n">01</div>
+        <div>
+          <h4>Reliable Structured Extraction Across Variable Layouts</h4>
+          <p>The core engineering challenge. Business documents vary enormously in formatting, scan quality, completeness, and layout. A registration document from one jurisdiction looks nothing like one from another. Getting GPT-4.1 Vision to return <strong>consistent, structured JSON</strong> — with the same field names, same value formats, and same confidence indicators — regardless of what the input document looks like required careful prompt engineering, extensive schema validation, and fallback handling for extraction failures. The extraction prompt was iteratively developed and tested across document variations until output consistency reached production reliability.</p>
+        </div>
+      </div>
+      <div class="ch-item">
+        <div class="ch-n">02</div>
+        <div>
+          <h4>Confidence Score Architecture</h4>
+          <p>Not all extraction failures look the same. A field that was clearly absent from a document is different from a field that was present but illegible. Designing a confidence scoring system that meaningfully distinguished between <em>"field not found"</em>, <em>"field found but low quality"</em>, and <em>"field found and high confidence"</em> required defining confidence tiers, deciding how they propagated to fraud signals, and ensuring the reviewer UI communicated the distinction clearly without overwhelming them with granular scores on every field.</p>
+        </div>
+      </div>
+      <div class="ch-item">
+        <div class="ch-n">03</div>
+        <div>
+          <h4>Prompt Engineering for Production Reliability</h4>
+          <p>AI responses in development look different from AI responses in production. With variable document types, variable scan quality, and variable content, prompts that worked in testing could produce unexpected output formats, hallucinated values, or missing keys in production. The extraction and Copilot prompts were engineered with explicit output constraints, example structures, fallback instructions for edge cases, and validation rules applied post-response. The goal was AI output that behaved <code>predictably</code>, not just <code>impressively</code>.</p>
+        </div>
+      </div>
+      <div class="ch-item">
+        <div class="ch-n">04</div>
+        <div>
+          <h4>Secure Document Access Architecture</h4>
+          <p>Documents processed by ProofPilot are sensitive business materials. Every document stored in Supabase Storage is accessed exclusively through time-limited signed URLs generated per request — never through public URLs or persistent access tokens. This meant designing the entire document retrieval flow around signed URL generation, ensuring the OpenAI Vision API could access documents during processing without storing or logging access credentials, and building reviewer-facing document display that worked within the same secure access model.</p>
+        </div>
+      </div>
+      <div class="ch-item">
+        <div class="ch-n">05</div>
+        <div>
+          <h4>Designing Signals as Information, Not Verdicts</h4>
+          <p>There was a design temptation to make fraud signal detection feel decisive — using language like "fraud detected" or "document rejected." This was deliberately avoided. Every signal in ProofPilot is framed as information that requires human interpretation, not a system conclusion. Engineering this required designing the signal schema, the UI language, the Copilot output, and the risk scoring to consistently communicate <em>"this warrants attention"</em> rather than <em>"this is fraudulent"</em> — which also has legal and liability implications in a real business document review context.</p>
+        </div>
+      </div>
+      <div class="ch-item">
+        <div class="ch-n">06</div>
+        <div>
+          <h4>Audit Trail Completeness</h4>
+          <p>For a document review system to be usable in a real business context, every action must be auditable — not just the final decision. ProofPilot logs each pipeline stage completion, the full AI output at extraction and Copilot stages, reviewer identity, review timestamp, and final decision with reason. The audit trail is immutable and queryable, designed so that any decision made in the system can be fully reconstructed from the log — including the AI findings that were presented to the reviewer at the time of decision.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCREENSHOTS -->
+<section class="cs" id="screenshots">
+  <div class="wide">
+    <div class="s-tag rv">Platform Screenshots</div>
+    <h2 class="s-title rv">Platform walkthrough</h2>
+    <div class="s-body rv"><p>Key screens from ProofPilot AI. Click any image to expand.</p></div>
+
+    <!-- Row 1: Full width dashboard -->
+    <div style="margin-top:36px" class="rv">
+      <div class="ss-slot ratio-219 hero-gi" data-lbl="ProofPilot AI — Main Dashboard" data-src="/images/proofpilot/dashboard-main.png">
+        <div class="ss-ph"><div class="ss-ph-icon">🖥</div><div class="ss-ph-label">ProofPilot AI — Main Dashboard</div><div class="ss-ph-path">/images/proofpilot/dashboard-main.png</div></div>
+        <div class="ss-ov"><span class="ss-ov-txt">View Screenshot</span></div>
+      </div>
+      <div class="ss-caption">Main dashboard — document overview and queue management</div>
+    </div>
+
+    <!-- Row 2: Upload + Queue -->
+    <div class="ss-grid-2 rv">
+      <div>
+        <div class="ss-slot ratio-43" data-lbl="Document Upload" data-src="/images/proofpilot/upload.png">
+          <div class="ss-ph"><div class="ss-ph-icon">📤</div><div class="ss-ph-label">Document Upload Screen</div><div class="ss-ph-path">/images/proofpilot/upload.png</div></div>
+          <div class="ss-ov"><span class="ss-ov-txt">View Screenshot</span></div>
+        </div>
+        <div class="ss-caption">Document upload &amp; intake</div>
+      </div>
+      <div>
+        <div class="ss-slot ratio-43" data-lbl="Review Queue" data-src="/images/proofpilot/queue.png">
+          <div class="ss-ph"><div class="ss-ph-icon">📋</div><div class="ss-ph-label">Review Queue</div><div class="ss-ph-path">/images/proofpilot/queue.png</div></div>
+          <div class="ss-ov"><span class="ss-ov-txt">View Screenshot</span></div>
+        </div>
+        <div class="ss-caption">Document review queue</div>
+      </div>
+    </div>
+
+    <!-- Row 3: AI Analysis + Signals -->
+    <div class="ss-grid-2 rv">
+      <div>
+        <div class="ss-slot ratio-169" data-lbl="AI Extraction Results" data-src="/images/proofpilot/ai-extraction.png">
+          <div class="ss-ph"><div class="ss-ph-icon">⬡</div><div class="ss-ph-label">AI Field Extraction Results</div><div class="ss-ph-path">/images/proofpilot/ai-extraction.png</div></div>
+          <div class="ss-ov"><span class="ss-ov-txt">View Screenshot</span></div>
+        </div>
+        <div class="ss-caption">Structured field extraction output</div>
+      </div>
+      <div>
+        <div class="ss-slot ratio-169" data-lbl="Fraud Signal Panel" data-src="/images/proofpilot/signals-panel.png">
+          <div class="ss-ph"><div class="ss-ph-icon">⚠️</div><div class="ss-ph-label">Fraud Signal Detection Panel</div><div class="ss-ph-path">/images/proofpilot/signals-panel.png</div></div>
+          <div class="ss-ov"><span class="ss-ov-txt">View Screenshot</span></div>
+        </div>
+        <div class="ss-caption">Detected fraud signals &amp; risk score</div>
+      </div>
+    </div>
+
+    <!-- Row 4: Copilot + Decision -->
+    <div class="ss-grid-2 rv">
+      <div>
+        <div class="ss-slot ratio-169" data-lbl="AI Copilot Review Brief" data-src="/images/proofpilot/copilot-brief.png">
+          <div class="ss-ph"><div class="ss-ph-icon">🤖</div><div class="ss-ph-label">AI Copilot Review Brief</div><div class="ss-ph-path">/images/proofpilot/copilot-brief.png</div></div>
+          <div class="ss-ov"><span class="ss-ov-txt">View Screenshot</span></div>
+        </div>
+        <div class="ss-caption">AI Copilot brief presented to reviewer</div>
+      </div>
+      <div>
+        <div class="ss-slot ratio-169" data-lbl="Human Review & Decision Screen" data-src="/images/proofpilot/review-decision.png">
+          <div class="ss-ph"><div class="ss-ph-icon">✓</div><div class="ss-ph-label">Human Review &amp; Decision Screen</div><div class="ss-ph-path">/images/proofpilot/review-decision.png</div></div>
+          <div class="ss-ov"><span class="ss-ov-txt">View Screenshot</span></div>
+        </div>
+        <div class="ss-caption">Human reviewer decision interface</div>
+      </div>
+    </div>
+
+    <!-- Row 5: Audit trail -->
+    <div style="margin-top:14px" class="rv">
+      <div class="ss-slot ratio-219" data-lbl="Audit History" data-src="/images/proofpilot/audit-history.png">
+        <div class="ss-ph"><div class="ss-ph-icon">📜</div><div class="ss-ph-label">Complete Audit History</div><div class="ss-ph-path">/images/proofpilot/audit-history.png</div></div>
+        <div class="ss-ov"><span class="ss-ov-txt">View Screenshot</span></div>
+      </div>
+      <div class="ss-caption">Immutable audit trail — every review decision logged with full context</div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTCOMES -->
+<section class="cs alt" id="outcomes">
+  <div class="inner" style="max-width:1100px">
+    <div class="s-tag rv">Outcomes</div>
+    <h2 class="s-title rv">What ProofPilot changed</h2>
+    <div class="s-body rv">
+      <p>ProofPilot replaced a largely manual document review process with an AI-assisted workflow. The outcomes are operational, not just technical.</p>
+    </div>
+    <div class="outcomes-grid rv">
+      <div class="oc-card">
+        <div class="oc-icon">⚡</div>
+        <h4>Reduced Manual Review Effort</h4>
+        <p>Reviewers no longer read documents from scratch. AI extraction and the Copilot brief mean the information is already structured and waiting — the reviewer's job is to assess findings, not gather them.</p>
+      </div>
+      <div class="oc-card">
+        <div class="oc-icon">◈</div>
+        <h4>Standardized Verification</h4>
+        <p>Every document goes through the same AI extraction and signal detection pipeline. Review decisions are now made against consistent, structured information — not varying levels of manually extracted detail.</p>
+      </div>
+      <div class="oc-card">
+        <div class="oc-icon">⬡</div>
+        <h4>Improved Decision Consistency</h4>
+        <p>When reviewers receive the same structured information format on every document, their decisions become more consistent. AI-assisted extraction reduces the variance that comes from different reviewers noticing different things in raw documents.</p>
+      </div>
+      <div class="oc-card">
+        <div class="oc-icon">🔍</div>
+        <h4>Earlier Issue Detection</h4>
+        <p>Fraud signals and inconsistencies are surfaced before human review begins — not discovered mid-review or missed entirely. Reviewers arrive at the decision stage already knowing where to focus their attention.</p>
+      </div>
+      <div class="oc-card">
+        <div class="oc-icon">📜</div>
+        <h4>Complete Audit Accountability</h4>
+        <p>Every review has a full, immutable audit trail. What AI findings were presented, who reviewed, what decision was made, when — all queryable. No review decision exists without a complete record of how it was reached.</p>
+      </div>
+      <div class="oc-card">
+        <div class="oc-icon">👤</div>
+        <h4>Human Judgment Preserved</h4>
+        <p>ProofPilot was built to extend human reviewers, not replace them. Every decision remains with a human. AI handles the information gathering — humans handle the judgment. That distinction is a deliberate product decision, not a limitation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH STACK -->
+<section class="cs" id="stack">
+  <div class="inner" style="max-width:1100px">
+    <div class="s-tag rv">Technology Stack</div>
+    <h2 class="s-title rv">What ProofPilot is built on</h2>
+    <div class="tech-cat-grid rv">
+      <div class="tech-cat">
+        <div class="tech-cat-head"><span class="tech-cat-icon">🤖</span><span class="tech-cat-name">AI &amp; LLM</span></div>
+        <div class="tech-cat-list">
+          <div><div class="tech-cat-item-name">OpenAI API</div><div class="tech-cat-item-role">Core AI provider</div></div>
+          <div><div class="tech-cat-item-name">GPT-4.1 Vision</div><div class="tech-cat-item-role">OCR &amp; structured extraction</div></div>
+          <div><div class="tech-cat-item-name">Prompt Engineering</div><div class="tech-cat-item-role">Reliable structured JSON output</div></div>
+        </div>
+      </div>
+      <div class="tech-cat">
+        <div class="tech-cat-head"><span class="tech-cat-icon">⚡</span><span class="tech-cat-name">Frontend</span></div>
+        <div class="tech-cat-list">
+          <div><div class="tech-cat-item-name">Next.js</div><div class="tech-cat-item-role">Review interface &amp; API routes</div></div>
+          <div><div class="tech-cat-item-name">Server-Side Processing</div><div class="tech-cat-item-role">Document pipeline execution</div></div>
+        </div>
+      </div>
+      <div class="tech-cat">
+        <div class="tech-cat-head"><span class="tech-cat-icon">⬡</span><span class="tech-cat-name">Backend</span></div>
+        <div class="tech-cat-list">
+          <div><div class="tech-cat-item-name">Supabase</div><div class="tech-cat-item-role">Auth · PostgreSQL · Storage</div></div>
+          <div><div class="tech-cat-item-name">REST APIs</div><div class="tech-cat-item-role">OpenAI &amp; Supabase integration</div></div>
+        </div>
+      </div>
+      <div class="tech-cat">
+        <div class="tech-cat-head"><span class="tech-cat-icon">🔒</span><span class="tech-cat-name">Infrastructure</span></div>
+        <div class="tech-cat-list">
+          <div><div class="tech-cat-item-name">Signed URL Access</div><div class="tech-cat-item-role">Time-limited document retrieval</div></div>
+          <div><div class="tech-cat-item-name">Audit Trail Architecture</div><div class="tech-cat-item-role">Immutable, queryable logging</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:36px;padding:28px;background:var(--card);border:1px solid var(--bdr);border-radius:16px" class="rv">
+      <div class="s-tag" style="margin-bottom:16px">Engineering Philosophy</div>
+      <p style="font-size:14px;color:var(--t2);line-height:1.82;font-weight:300">ProofPilot was built with a <strong style="color:var(--t1);font-weight:500">technology-agnostic product mindset</strong>. The stack was chosen to solve the problem, not to showcase technologies. Next.js provided the flexibility to handle both the frontend review interface and the server-side AI processing pipeline in a single deployable system. Supabase provided auth, database, and storage with a security model appropriate for sensitive business documents. OpenAI provided the AI capabilities — and prompt engineering determined how reliably those capabilities performed in production. Every technology choice was a product decision.</p>
+    </div>
+  </div>
+</section>
+
+<!-- NEXT -->
+<div class="next-bar">
+  <div class="next-inner">
+    <div>
+      <div class="next-lbl">Next Case Study</div>
+      <div class="next-title">Djiminy — Enterprise Device &amp; Lifecycle Platform</div>
+    </div>
+    <a href="djiminy.html" class="next-btn">View Case Study <svg width="14" height="14" fill="none"><path d="M3 7h8M7.5 3.5l4 3.5-4 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  </div>
+</div>
+
+<footer>
+  <div class="fl"><a href="../index.html">premchandar.dev</a></div>
+  <div class="fl">ProofPilot AI Case Study · BuildFlow · 2024–Present</div>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lb" role="dialog" aria-modal="true">
+  <button class="lb-close" onclick="closeLb()" aria-label="Close">✕</button>
+  <div class="lb-ph" id="lb-content">
+    <div class="lb-name" id="lb-name"></div>
+  </div>
+</div>
+
+<script>
+/* REVEAL */
+var rvEls=document.querySelectorAll('.rv');
+if('IntersectionObserver' in window){
+  var o=new IntersectionObserver(function(e){e.forEach(function(i){if(i.isIntersecting){i.target.classList.add('vis');o.unobserve(i.target)}})},{threshold:.06});
+  rvEls.forEach(function(el){o.observe(el)});
+}else{rvEls.forEach(function(el){el.classList.add('vis')})}
+setTimeout(function(){rvEls.forEach(function(el){el.classList.add('vis')})},3000);
+
+/* LIGHTBOX */
+var lb=document.getElementById('lb');
+var lbContent=document.getElementById('lb-content');
+
+function openLb(src,lbl){
+  lbContent.innerHTML='';
+  lbContent.style.background='';lbContent.style.border='';lbContent.style.aspectRatio='';
+  var img=new Image();
+  img.onload=function(){
+    img.style.cssText='max-width:88vw;max-height:85vh;border-radius:12px;object-fit:contain;display:block';
+    img.alt=lbl;
+    lbContent.style.background='none';lbContent.style.border='none';
+    lbContent.appendChild(img);
+  };
+  img.onerror=function(){lbContent.innerHTML='<div class="lb-name">'+lbl+'</div>'};
+  img.src=src;
+  lb.classList.add('active');document.body.style.overflow='hidden';
+}
+function closeLb(){lb.classList.remove('active');document.body.style.overflow=''}
+lb.addEventListener('click',function(e){if(e.target===lb)closeLb()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLb()});
+
+/* Wire all clickable image slots */
+document.querySelectorAll('.ss-slot[data-src], .gi[data-src]').forEach(function(el){
+  var src=el.getAttribute('data-src');
+  var lbl=el.getAttribute('data-lbl')||'';
+  if(!src) return;
+
+  /* preload into card */
+  var img=new Image();
+  img.onload=function(){
+    img.alt=lbl;
+    img.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:inherit;opacity:.85;transition:opacity .3s;z-index:1';
+    var ph=el.querySelector('.ss-ph,.gi-ph');
+    if(ph) ph.style.display='none';
+    var ov=el.querySelector('.ss-ov,.gi-ov');
+    if(ov) el.insertBefore(img,ov); else el.appendChild(img);
+    el.addEventListener('mouseenter',function(){img.style.opacity='1'});
+    el.addEventListener('mouseleave',function(){img.style.opacity='.85'});
+  };
+  img.src=src;
+
+  /* open lightbox */
+  el.addEventListener('click',function(){openLb(src,lbl)});
+});
+
+/* STICKY SECTION NAV */
+var sections=['problem','solution','role','architecture','pipeline','signals','copilot','engineering','screenshots','outcomes','stack'];
+var snLinks=document.querySelectorAll('.sn-link');
+function updateSN(){
+  var top=window.scrollY+130;var cur='';
+  sections.forEach(function(id){var el=document.getElementById(id);if(el&&el.offsetTop<=top)cur=id});
+  snLinks.forEach(function(l){l.classList.toggle('active',l.getAttribute('data-target')===cur)});
+}
+window.addEventListener('scroll',updateSN,{passive:true});
+snLinks.forEach(function(l){
+  l.addEventListener('click',function(){
+    var t=document.getElementById(this.getAttribute('data-target'));
+    if(t)t.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+});
+</script>
+</body>
+</html>
