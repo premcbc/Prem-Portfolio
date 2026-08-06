@@ -160,6 +160,8 @@ h1.hero-title em{font-style:italic;background:var(--grad);-webkit-background-cli
 
 /* PROJECT CARDS */
 .projects-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.projects-top{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.projects-bottom{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .project-card{position:relative;border-radius:18px;overflow:hidden;background:var(--card);border:1px solid var(--bdr);cursor:pointer;display:block;transition:border-color .5s var(--smooth),transform .5s var(--spring),box-shadow .5s var(--spring);-webkit-tap-highlight-color:transparent;will-change:transform}
 .project-card:hover{border-color:var(--bdr-h);transform:translateY(-6px);box-shadow:0 0 0 1px rgba(255,255,255,.04) inset,0 32px 64px -16px rgba(0,0,0,.6),0 0 80px -20px rgba(200,255,0,.06)}
 .project-card:active{transform:translateY(-2px)}
@@ -329,6 +331,8 @@ footer{padding:28px 56px;border-top:1px solid var(--bdr);display:flex;justify-co
 @media(max-width:1200px){section{padding:100px 40px}nav{padding:16px 40px}nav.scrolled{padding:12px 40px}.hero{padding:132px 40px 80px}}
 @media(max-width:1024px){
   .projects-grid{grid-template-columns:repeat(2,1fr)}
+  .projects-top{grid-template-columns:1fr}
+  .projects-bottom{grid-template-columns:repeat(2,1fr)}
   .about-grid{grid-template-columns:1fr;gap:48px}
   .sk-grid,.proc-grid,.ep-grid{grid-template-columns:repeat(2,1fr)}
   .wib-grid{grid-template-columns:repeat(2,1fr)}
@@ -344,6 +348,7 @@ footer{padding:28px 56px;border-top:1px solid var(--bdr);display:flex;justify-co
   .hm{padding:18px 22px}
   .s-header{flex-direction:column;align-items:flex-start;gap:6px;margin-bottom:44px}
   .proc-grid,.ep-grid,.sk-grid,.wib-grid{grid-template-columns:1fr}
+  .projects-bottom{grid-template-columns:1fr}
   .tl-row{grid-template-columns:1fr;gap:6px}
   .tl-date{padding-top:0}
   .m-metrics{grid-template-columns:1fr 1fr}
@@ -482,13 +487,14 @@ footer{padding:28px 56px;border-top:1px solid var(--bdr);display:flex;justify-co
 <section id="work" class="alt-bg">
   <div class="s-header rv">
     <div><div class="s-tag">Case Studies</div><h2 class="s-title">Engineering Case Studies</h2></div>
-    <div class="s-count">04 systems shipped</div>
   </div>
-  <div class="projects-grid">
+
+  <!-- Top tier: full case studies -->
+  <div class="projects-top">
 
     <!-- ProofPilot AI — FEATURED -->
-    <a class="project-card rv" href="projects/proofpilot.html" style="grid-column:1/-1" aria-label="ProofPilot AI case study">
-      <div class="p-thumb" style="aspect-ratio:21/9">
+    <a class="project-card rv" href="projects/proofpilot.html" aria-label="ProofPilot AI case study">
+      <div class="p-thumb">
         <div class="p-inner pt0">
           <div class="p-word">ProofPilot AI</div>
           <div class="p-tag-fl">Featured — AI Case Study</div>
@@ -497,8 +503,8 @@ footer{padding:28px 56px;border-top:1px solid var(--bdr);display:flex;justify-co
       <div class="p-info">
         <div class="p-row"><div class="p-name">ProofPilot AI</div><div class="p-geo">BuildFlow · 2024–Present</div></div>
         <div class="p-type">AI Document Intelligence Platform</div>
-        <div class="p-desc">AI-powered document intelligence platform that automates document verification using OCR, LLM-powered extraction, fraud detection, and human-in-the-loop review workflows — replacing manual verification with an intelligent, auditable AI pipeline.</div>
-        <div class="p-pills"><span class="pill">OpenAI</span><span class="pill">REST APIs</span><span class="pill">Supabase</span><span class="pill">Next.js</span><span class="pill">Prompt Engineering</span><span class="pill">Workflow Automation</span></div>
+        <div class="p-desc">AI-powered document intelligence platform that automates document verification using OCR, LLM-powered extraction, fraud detection, and human-in-the-loop review workflows.</div>
+        <div class="p-pills"><span class="pill">OpenAI</span><span class="pill">REST APIs</span><span class="pill">Supabase</span><span class="pill">Next.js</span><span class="pill">Prompt Engineering</span></div>
       </div>
       <div class="p-cta" aria-hidden="true">View Full Case Study <svg width="12" height="12" fill="none"><path d="M2.5 9.5L9.5 2.5M9.5 2.5H4.5M9.5 2.5V7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </a>
@@ -514,6 +520,11 @@ footer{padding:28px 56px;border-top:1px solid var(--bdr);display:flex;justify-co
       </div>
       <div class="p-cta" aria-hidden="true">View Full Case Study <svg width="12" height="12" fill="none"><path d="M2.5 9.5L9.5 2.5M9.5 2.5H4.5M9.5 2.5V7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </a>
+
+  </div>
+
+  <!-- Bottom tier: quick-look projects -->
+  <div class="projects-bottom">
 
     <!-- Pola -->
     <div class="project-card rv" data-modal="pola" role="button" tabindex="0">
@@ -540,12 +551,12 @@ footer{padding:28px 56px;border-top:1px solid var(--bdr);display:flex;justify-co
     </div>
 
     <!-- Cricket -->
-    <div class="project-card rv" data-modal="cricket" role="button" tabindex="0" style="grid-column:1/-1">
-      <div class="p-thumb" style="aspect-ratio:21/9"><div class="p-inner pt5"><div class="p-word">LiveCricket</div></div></div>
+    <div class="project-card rv" data-modal="cricket" role="button" tabindex="0">
+      <div class="p-thumb"><div class="p-inner pt5"><div class="p-word">LiveCricket</div></div></div>
       <div class="p-info">
         <div class="p-row"><div class="p-name">Cricket Streaming App</div><div class="p-geo">Real-Time · 2023</div></div>
         <div class="p-type">Real-Time Sports Data System</div>
-        <div class="p-desc">Live cricket data pipeline with recursive API polling at 0.3-second intervals. Engineered for continuous real-time data ingestion without performance degradation.</p>
+        <div class="p-desc">Live cricket data pipeline with recursive API polling at 0.3-second intervals. Engineered for continuous real-time data ingestion without performance degradation.</div>
         <div class="p-pills"><span class="pill">Real-Time Systems</span><span class="pill">Recursive Workflows</span><span class="pill">API Architecture</span></div>
       </div>
       <div class="p-cta" aria-hidden="true">View Details <svg width="12" height="12" fill="none"><path d="M2.5 9.5L9.5 2.5M9.5 2.5H4.5M9.5 2.5V7.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -677,7 +688,7 @@ footer{padding:28px 56px;border-top:1px solid var(--bdr);display:flex;justify-co
         <svg width="14" height="14" fill="none"><path d="M4 3.5a1 1 0 11-2 0 1 1 0 012 0zM2.5 5.5h1.5v7H2.5v-7zm3 0H7l.1 1c.5-.7 1.2-1.2 2.1-1.2 1.9 0 2.6 1.2 2.6 3V12.5H10.3V8.7c0-.9-.2-1.8-1.3-1.8-.9 0-1.5.7-1.5 1.6v4H6V5.5z" fill="currentColor"/></svg>
         LinkedIn
       </a>
-      <a href="https://drive.google.com/file/d/1EmeSWpRHIMF8j5OJzNCU4mZ6OYf5Q3au/view" target="_blank" rel="noopener" class="clink">
+      <a href="https://drive.google.com/file/d/1nCeSvCeXWky5Vvtx-epuBhKP70aeqm-V/view" target="_blank" rel="noopener" class="clink">
         <svg width="14" height="14" fill="none"><path d="M10.5 1.5H3.5a1.5 1.5 0 00-1.5 1.5v9a1.5 1.5 0 001.5 1.5h7a1.5 1.5 0 001.5-1.5V3a1.5 1.5 0 00-1.5-1.5zM5.5 5h3M5.5 7.5h3M5.5 10h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
         Resume
       </a>
